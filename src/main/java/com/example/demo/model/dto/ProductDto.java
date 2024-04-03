@@ -27,6 +27,7 @@ public class ProductDto {
 	private String amtDetail;
 	private String depositCycle;
 	private BigDecimal interstRate;
+	private String productDetail;
 	
 	public Product toEntity() {
 		Product product = new Product();
@@ -42,6 +43,7 @@ public class ProductDto {
 		product.setAmtDetail(this.getAmtDetail());
 		product.setDepositCycle(this.getDepositCycle());
 		product.setInterstRate(this.getInterstRate());
+		product.setProductDetail(this.getProductDetail());
 		return product;
 	}
 	
