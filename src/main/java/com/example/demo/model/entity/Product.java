@@ -63,6 +63,9 @@ public class Product {
 	
 	@Column(name="INTEREST_RATE")
 	private BigDecimal interstRate;
+	
+	@Column(name="PRODUCT_DETAIL")
+	private String productDetail;
 
 	// 일대일 관계 - List 형태가 아니라 Enroll 형태
 	@OneToOne(mappedBy="product", cascade = CascadeType.ALL)
@@ -83,6 +86,7 @@ public class Product {
 		dto.setAmtDetail(this.getAmtDetail());
 		dto.setDepositCycle(this.getDepositCycle());
 		dto.setInterstRate(this.getInterstRate());
+		dto.setProductDetail(this.getProductDetail());		
 		return dto;
 	}
 }
