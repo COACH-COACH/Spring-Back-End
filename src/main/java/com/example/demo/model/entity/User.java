@@ -40,24 +40,24 @@ public class User {
 	@Column(name="LOGIN_PW")
 	private String loginPw;
 	
-	@Column(name="FULL_NAME")
-	private String fullName;
-	
-	@Column(name="SEX")
-	@Enumerated(EnumType.STRING)
-	private Sex sex;
-	
-	@Column(name="BIRTH_DATE")
-	private Date birthDate;
-	
-	@Column(name="REGION")
-	private String region;
-	
-	@Column(name="REGIST_DATE")
-	private Date registDate;
-	
-	@Column(name="LIFE_STAGE")
-	private LifeStage lifeStage;
+//	@Column(name="FULL_NAME")
+//	private String fullName;
+//	
+//	@Column(name="SEX")
+//	@Enumerated(EnumType.STRING)
+//	private Sex sex;
+//	
+//	@Column(name="BIRTH_DATE")
+//	private Date birthDate;
+//	
+//	@Column(name="REGION")
+//	private String region;
+//	
+//	@Column(name="REGIST_DATE")
+//	private Date registDate;
+//	
+//	@Column(name="LIFE_STAGE")
+//	private LifeStage lifeStage;
 
 	// 관계설정
 	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
@@ -73,11 +73,11 @@ public class User {
 		dto.setId(this.getId());
 		dto.setLoginId(this.getLoginId());
 		dto.setLoginPw(this.getLoginPw());
-		dto.setFullName(this.getFullName());
-		dto.setSex(this.getSex());
-		dto.setBirthDate(this.getBirthDate());
-		dto.setRegion(this.getRegion());
-		dto.setLifeStage(this.getLifeStage());
+//		dto.setFullName(this.getFullName());
+//		dto.setSex(this.getSex());
+//		dto.setBirthDate(this.getBirthDate());
+//		dto.setRegion(this.getRegion());
+//		dto.setLifeStage(this.getLifeStage());
 		return dto;
 	}
 }
