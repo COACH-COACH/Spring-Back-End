@@ -1,8 +1,11 @@
 package com.example.demo.model.dto;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import com.example.demo.model.entity.Product;
+import com.example.demo.model.enums.DepositCycle;
+import com.example.demo.model.enums.ProductType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,33 +20,35 @@ import lombok.NoArgsConstructor;
 public class ProductDto {
 	private int id;
 	private String productName;
-	private String productType;
+	private BigDecimal interestRate;
+	private BigDecimal maxInterestRate;
+	private Date createDate;
+	private String preferCondition;
+	private String membershipCondition;
 	private String eligibility;
-	private int minTerm;
-	private int maxTerm;
-	private String termDetail;
-	private BigDecimal minAmt;
-	private BigDecimal maxAmt;
-	private String amtDetail;
-	private String depositCycle;
-	private BigDecimal interstRate;
-	private String productDetail;
+	private String caution;
+	private String limitAmt;
+	private DepositCycle depositCycle;
+	private int maturity;
+	private ProductType productType;
 	
 	public Product toEntity() {
 		Product product = new Product();
+		
 		product.setId(this.getId());
 		product.setProductName(this.getProductName());
-		product.setProductType(this.getProductType());
+		product.setInterestRate(this.getInterestRate());
+		product.setMaxInterestRate(this.getMaxInterestRate());
+		product.setCreateDate(this.getCreateDate());
+		product.setPreferCondition(this.getPreferCondition());
+		product.setMembershipCondition(this.getMembershipCondition());
 		product.setEligibility(this.getEligibility());
-		product.setMinTerm(this.getMinTerm());
-		product.setMaxTerm(this.getMaxTerm());
-		product.setTermDetail(this.getTermDetail());
-		product.setMinAmt(this.getMinAmt());
-		product.setMaxAmt(this.getMaxAmt());
-		product.setAmtDetail(this.getAmtDetail());
+		product.setCaution(this.getCaution());
+		product.setLimitAmt(this.getLimitAmt());
 		product.setDepositCycle(this.getDepositCycle());
-		product.setInterstRate(this.getInterstRate());
-		product.setProductDetail(this.getProductDetail());
+		product.setMaturity(this.getMaturity());
+		product.setProductType(this.getProductType());
+		
 		return product;
 	}
 	

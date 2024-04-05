@@ -65,20 +65,20 @@ public class JWTFilter extends OncePerRequestFilter {
         System.out.println(loginId);
         System.out.println("!!!!!@@@@@@@@@@@@@@@@@@@@@");
 				
-				//userEntity를 생성하여 값 set
+		//userEntity를 생성하여 값 set
         User userEntity = new User();
         userEntity.setLoginId(loginId);
         
         // 비번은 토큰에 담겨있지 않았지만, 매번 db에서 조회할 때마다 비번까지 같이 조회하는 것을 막기 위해 아무거나 입력해서 초기화함
         userEntity.setLoginPw("temppassword");
-
 				
-				//UserDetails에 회원 정보 객체 담기
+		//UserDetails에 회원 정보 객체 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
 
-				//스프링 시큐리티 인증 토큰 생성
+		//스프링 시큐리티 인증 토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
-				//세션에 사용자 등록
+		
+        //세션에 사용자 등록
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);

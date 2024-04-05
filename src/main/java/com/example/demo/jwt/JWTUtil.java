@@ -48,4 +48,5 @@ public class JWTUtil {
                 .signWith(secretKey) // 얘로 시그니처 만들어서 암호화 진행
                 .compact();
     }
+    
 }

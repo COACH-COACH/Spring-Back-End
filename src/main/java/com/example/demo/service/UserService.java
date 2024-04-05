@@ -42,14 +42,15 @@ public class UserService {
 	
 	public void addUser(UserDto dto) {
 
+		String seq = null;
         String loginId = dto.getLoginId();
         String loginPw = dto.getLoginPw();
-//    	String fullName = dto.getFullName();
-//    	Sex sex = dto.getSex();
-//    	Date birthDate = dto.getBirthDate();
-//    	String region = dto.getRegion();
-//    	Date registDate = new Date();
-//    	LifeStage lifeStage = dto.getLifeStage();
+    	String fullName = dto.getFullName();
+    	Sex sex = dto.getSex();
+    	Date birthDate = dto.getBirthDate();
+    	String region = dto.getRegion();
+    	Date registDate = new Date();
+    	LifeStage lifeStage = dto.getLifeStage();
 
         Boolean isExist = urepo.existsByLoginId(loginId);
         
@@ -59,14 +60,15 @@ public class UserService {
 
         User data = new User();
         
+        data.setSeq(seq);
         data.setLoginId(loginId);
         data.setLoginPw(bCryptPasswordEncoder.encode(loginPw));
-//        data.setFullName(fullName);
-//        data.setSex(sex);
-//        data.setBirthDate(birthDate);
-//        data.setRegion(region);
-//        data.setRegistDate(registDate);
-//        data.setLifeStage(lifeStage);
+        data.setFullName(fullName);
+        data.setSex(sex);
+        data.setBirthDate(birthDate);
+        data.setRegion(region);
+        data.setRegistDate(registDate);
+        data.setLifeStage(lifeStage);
 
         urepo.save(data);
     }

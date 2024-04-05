@@ -20,12 +20,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-				
+		System.out.println("!!!!!!!!!!!!!!!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+    	System.out.println(loginId);
 		//DB에서 조회
         User userData = userRepository.findByLoginId(loginId);
-
+        
         if (userData != null) {
-						
+		
 			//UserDetails에 담아서 return하면 AutneticationManager가 검증 함
             return new CustomUserDetails(userData);
         }
