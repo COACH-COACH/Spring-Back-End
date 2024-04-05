@@ -3,19 +3,20 @@ import java.util.Date;
 import java.util.List;
 
 import com.example.demo.model.dto.UserDto;
-import com.example.demo.model.enums.Sex;
 import com.example.demo.model.enums.LifeStage;
+import com.example.demo.model.enums.Sex;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,33 +35,39 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
+	@Column(name="SEQ")
+	private String seq;
+	
 	@Column(name="LOGIN_ID", unique=true)
 	private String loginId;
 	
 	@Column(name="LOGIN_PW")
 	private String loginPw;
 	
-//	@Column(name="FULL_NAME")
-//	private String fullName;
-//	
-//	@Column(name="SEX")
-//	@Enumerated(EnumType.STRING)
-//	private Sex sex;
-//	
-//	@Column(name="BIRTH_DATE")
-//	private Date birthDate;
-//	
-//	@Column(name="REGION")
-//	private String region;
-//	
-//	@Column(name="REGIST_DATE")
-//	private Date registDate;
-//	
-//	@Column(name="LIFE_STAGE")
-//	private LifeStage lifeStage;
+	@Column(name="FULL_NAME")
+	private String fullName;
+	
+	@Column(name="SEX")
+	@Enumerated(EnumType.STRING)
+	private Sex sex;
+	
+	@Column(name="BIRTH_DATE")
+	private Date birthDate;
+	// ("yyyy-MM-dd'T'HH:mm:ss.SSSX", "yyyy-MM-dd'T'HH:mm:ss.SSS", "EEE, dd MMM yyyy HH:mm:ss zzz", "yyyy-MM-dd")
+	
+	@Column(name="REGION")
+	private String region;
+	
+	@Column(name="REGIST_DATE")
+	private Date registDate;
+	
+	@Column(name="LIFE_STAGE")
+	@Enumerated(EnumType.STRING)
+	private LifeStage lifeStage;
 
 	// 관계설정
-	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
+	
+	@OneToMany(mappedBy="user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Payment> payments;
 	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
 	private List<Goal> goals;
@@ -71,13 +78,15 @@ public class User {
 	public UserDto toDto() {
 		UserDto dto = new UserDto();
 		dto.setId(this.getId());
+		dto.setSeq(this.getSeq());
 		dto.setLoginId(this.getLoginId());
 		dto.setLoginPw(this.getLoginPw());
-//		dto.setFullName(this.getFullName());
-//		dto.setSex(this.getSex());
-//		dto.setBirthDate(this.getBirthDate());
-//		dto.setRegion(this.getRegion());
-//		dto.setLifeStage(this.getLifeStage());
+		dto.setFullName(this.getFullName());
+		dto.setSex(this.getSex());
+		dto.setBirthDate(this.getBirthDate());
+		dto.setRegion(this.getRegion());
+		dto.setLifeStage(this.getLifeStage());
+		
 		return dto;
 	}
 }

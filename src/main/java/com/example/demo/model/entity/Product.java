@@ -1,12 +1,17 @@
 package com.example.demo.model.entity;
 import java.math.BigDecimal;
 //import java.util.List;
+import java.util.Date;
 
 import com.example.demo.model.dto.ProductDto;
+import com.example.demo.model.enums.DepositCycle;
+import com.example.demo.model.enums.ProductType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,38 +39,40 @@ public class Product {
 	@Column(name="PRODUCT_NAME")
 	private String productName;
 	
-	@Column(name="PRODUCT_TYPE")	// 목돈 모으기, 주택청약 등
-	private String productType;
+	@Column(name="INTEREST_RATE")
+	private BigDecimal interestRate;
+	
+	@Column(name="MAX_INTEREST_RATE")
+	private BigDecimal maxInterestRate;
+	
+	@Column(name="CREATE_DATE")
+	private Date createDate;
+	
+	@Column(name="PREFER_CONDITION")
+	private String preferCondition;
+	
+	@Column(name="MEMBERSHIP_CONDITION")
+	private String membershipCondition;
 	
 	@Column(name="ELIGIBILITY")
 	private String eligibility;
 	
-	@Column(name="MIN_TERM")
-	private int minTerm;
+	@Column(name="CAUTION")
+	private String caution;
 	
-	@Column(name="MAX_TERM")
-	private int maxTerm;
-	
-	@Column(name="TERM_DETAIL")
-	private String termDetail;
-	
-	@Column(name="MIN_AMT")
-	private BigDecimal minAmt;
-	
-	@Column(name="MAX_AMT")
-	private BigDecimal maxAmt;
-	
-	@Column(name="AMT_DETAIL")
-	private String amtDetail;
+	@Column(name="LIMIT_AMT")
+	private String limitAmt;
 	
 	@Column(name="DEPOSIT_CYCLE")
-	private String depositCycle;
+	@Enumerated(EnumType.STRING)
+	private DepositCycle depositCycle;
 	
-	@Column(name="INTEREST_RATE")
-	private BigDecimal interstRate;
+	@Column(name="MATURITY")
+	private int maturity;
 	
-	@Column(name="PRODUCT_DETAIL")
-	private String productDetail;
+	@Column(name="PRODUCT_TYPE")
+	@Enumerated(EnumType.STRING) // 목돈 모으기, 주택청약 등
+	private ProductType productType;
 
 	// 일대일 관계 - List 형태가 아니라 Enroll 형태
 	@OneToOne(mappedBy="product", cascade = CascadeType.ALL)
@@ -74,19 +81,21 @@ public class Product {
 	// toDto() : entity -> dto
 	public ProductDto toDto() {
 		ProductDto dto = new ProductDto();
+		
 		dto.setId(this.getId());
 		dto.setProductName(this.getProductName());
-		dto.setProductType(this.getProductType());
+		dto.setInterestRate(this.getInterestRate());
+		dto.setMaxInterestRate(this.getMaxInterestRate());
+		dto.setCreateDate(this.getCreateDate());
+		dto.setPreferCondition(this.getPreferCondition());
+		dto.setMembershipCondition(this.getMembershipCondition());
 		dto.setEligibility(this.getEligibility());
-		dto.setMinTerm(this.getMinTerm());
-		dto.setMaxTerm(this.getMaxTerm());
-		dto.setTermDetail(this.getTermDetail());
-		dto.setMinAmt(this.getMinAmt());
-		dto.setMaxAmt(this.getMaxAmt());
-		dto.setAmtDetail(this.getAmtDetail());
+		dto.setCaution(this.getCaution());
+		dto.setLimitAmt(this.getLimitAmt());
 		dto.setDepositCycle(this.getDepositCycle());
-		dto.setInterstRate(this.getInterstRate());
-		dto.setProductDetail(this.getProductDetail());		
+		dto.setMaturity(this.getMaturity());
+		dto.setProductType(this.getProductType());	
+		
 		return dto;
 	}
 }
