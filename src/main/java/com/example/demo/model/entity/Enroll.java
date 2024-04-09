@@ -34,7 +34,7 @@ public class Enroll {
 	
 	// 관계 제약 조건 설정 필요 (1:M), FK - join column
 	@ManyToOne
-	@JoinColumn(name="CUSTOMER_ID_FK", referencedColumnName = "ID_PK")
+	@JoinColumn(name="USER_ID_FK", referencedColumnName = "ID_PK")
 	private User user;
 	
 	// 관계 제약 조건 설정 필요(1:1), FK - join column
@@ -53,14 +53,11 @@ public class Enroll {
 	@Column(name="END_DATE")
 	private Date endDate;
 	
-	@Column(name="REGULAR_DEPOSIT")
-	private BigDecimal regularDeposit;
-	
 	@Column(name="ACCUMULATED_BALANCE")
 	private BigDecimal accumulatedBalance;
 	
 	@Column(name="MATURITY_ST")
-	private MaturitySt maturitySt;
+	private Byte maturitySt;
 	
 	// toDto() : entity -> dto
 	public EnrollDto toDto() {
@@ -71,7 +68,6 @@ public class Enroll {
 		dto.setGoalId(this.getGoal().getId());
 		dto.setStartDate(this.getStartDate());
 		dto.setEndDate(this.getEndDate());
-		dto.setRegularDeposit(this.getRegularDeposit());
 		dto.setAccumulatedBalance(this.getAccumulatedBalance());
 		dto.setMaturitySt(this.getMaturitySt());
 		return dto;

@@ -5,7 +5,6 @@ import java.util.Date;
 //import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.model.entity.Goal;
-import com.example.demo.model.enums.GoalSt;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,12 +18,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GoalDto {
 	private int id;
-	private int customerId;
+	private int userId;
 	private String goalName;
 	private BigDecimal targetCost;
 	private BigDecimal accumulatedBalance;
-	private GoalSt goalSt;
-	private String goalPeriod;
+	private Byte goalSt;
+	private int goalPeriod;
 	private Date startDate;
 	private Date endDate;
 	

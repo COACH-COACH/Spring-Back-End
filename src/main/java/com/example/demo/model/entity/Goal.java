@@ -3,7 +3,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.example.demo.model.dto.GoalDto;
-import com.example.demo.model.enums.GoalSt;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,13 +29,13 @@ import lombok.NoArgsConstructor;
 @Table(name="GOAL_TB")
 public class Goal {
 	@Id
-	@Column(name="ID_PK")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name="ID_PK")
 	private int id;
 	
 	// 관계 제약 조건 설정 필요 (:M), FK - join column
 	@ManyToOne
-	@JoinColumn(name="CUSTOMER_ID_FK", referencedColumnName = "ID_PK")
+	@JoinColumn(name="USER_ID_FK", referencedColumnName = "ID_PK")
 	private User user;
 	
 	@Column(name="GOAL_NAME")
@@ -49,10 +48,10 @@ public class Goal {
 	private BigDecimal accumulatedBalance;
 	
 	@Column(name="GOAL_ST")
-	private GoalSt goalSt;
+	private Byte goalSt;
 	
 	@Column(name="GOAL_PERIOD")
-	private String goalPeriod;
+	private int goalPeriod;
 	
 	@Column(name="START_DATE")
 	private Date startDate;
@@ -68,7 +67,7 @@ public class Goal {
 	public GoalDto toDto() {
 		GoalDto dto = new GoalDto();
 		dto.setId(this.getId());
-		dto.setCustomerId(this.getUser().getId());
+		dto.setUserId(this.getUser().getId());
 		dto.setGoalName(this.getGoalName());
 		dto.setTargetCost(this.getTargetCost());
 		dto.setAccumulatedBalance(this.getAccumulatedBalance());
