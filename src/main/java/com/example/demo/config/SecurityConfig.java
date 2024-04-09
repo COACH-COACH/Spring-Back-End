@@ -48,19 +48,6 @@ public class SecurityConfig {
     BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	
-	@Bean
-	CorsConfigurationSource corsConfigurationSource() {
-	    CorsConfiguration configuration = new CorsConfiguration();
-	    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080")); // 클라이언트의 호스트
-	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-	    configuration.setAllowCredentials(true); // 쿠키를 포함시킬지 여부
-	    
-	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 설정 적용
-	    return source;
-	}
 
 	// HTTP 보안 관련 설정
     @Bean
