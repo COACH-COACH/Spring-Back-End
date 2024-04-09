@@ -1,5 +1,7 @@
 package com.example.demo.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,10 +12,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.demo.jwt.JWTFilter;
 import com.example.demo.jwt.JWTUtil;
 import com.example.demo.jwt.LoginFilter;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 // Spring Security를 이용하여 보안 설정을 정의하는 클래스
 @Configuration
@@ -41,11 +48,41 @@ public class SecurityConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+	
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+	    CorsConfiguration configuration = new CorsConfiguration();
+	    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080")); // 클라이언트의 호스트
+	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+	    configuration.setAllowCredentials(true); // 쿠키를 포함시킬지 여부
+	    
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 설정 적용
+	    return source;
+	}
 
 	// HTTP 보안 관련 설정
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		// CSRF 보호 기능 비활성화(세션 방식은 필요하나, JWT는 세션을 STATELESS로 관리하기 때문에 필요X)
+		http.cors((cors) -> cors.configurationSource(new CorsConfigurationSource() {
+			
+			@Override
+			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+				CorsConfiguration configuration = new CorsConfiguration();
+				
+			    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+			    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+			    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+			    configuration.setAllowCredentials(true); // 쿠키를 포함시킬지 여부
+			    
+			    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+			    source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 설정 적용
+				return configuration;
+			}
+		}));
+    	
+    	// CSRF 보호 기능 비활성화(세션 방식은 필요하나, JWT는 세션을 STATELESS로 관리하기 때문에 필요X)
         http.csrf((auth) -> auth.disable());
 
 		// FORM 기반 로그인 비활성

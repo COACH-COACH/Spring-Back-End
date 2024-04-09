@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,10 +24,8 @@ public class GoalController {
 	}
 	
 	@GetMapping("/list")
-	@PreAuthorize("isAuthenticated()")
-	public List<GoalDto> getGoalList(Principal principal) {
-		String username = principal.getName();
-		System.out.println(username);
+	public List<GoalDto> getGoalList() {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		List<GoalDto> goalList = goalService.getGoalListByUsername(username);
 		return goalList;
 	}
