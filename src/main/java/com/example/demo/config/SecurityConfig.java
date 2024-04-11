@@ -72,6 +72,7 @@ public class SecurityConfig {
     	// CSRF 보호 기능 비활성화(세션 방식은 필요하나, JWT는 세션을 STATELESS로 관리하기 때문에 필요X)
         http.csrf((auth) -> auth.disable());
 
+
 		// FORM 기반 로그인 비활성
         http.formLogin((auth) -> auth.disable());
 
@@ -89,7 +90,7 @@ public class SecurityConfig {
         
         // (1) addFilterAt으로 우리가 만든 LoginFilter를 등록
         http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
-        
+
 		// 세션 정책을 STATELESS로 설정: 세션을 사용하지 않고, 각 요청마다 인증을 확인
         // = RESTful API 서비스에 적합한 설정 = JWT 토큰 기반 인증 방식과 잘 맞음
         http.sessionManagement((session) -> session
