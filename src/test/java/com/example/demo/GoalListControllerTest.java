@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.demo.model.dto.response.GoalListResDto;
-import com.example.demo.model.dto.response.GoalSatistics;
+import com.example.demo.model.dto.response.GoalSatisticsResDto;
 import com.example.demo.service.GoalService;
 
 @SpringBootTest
@@ -26,8 +26,8 @@ public class GoalListControllerTest {
 	@Test
 	void 생명주기별목표조회() {
 		String username = "shin";
-		List<GoalSatistics> goalDetailList = goalService.getGoalStatList(username);
-		for (GoalSatistics goalDetail: goalDetailList) {
+		List<GoalSatisticsResDto> goalDetailList = goalService.getGoalStatList(username);
+		for (GoalSatisticsResDto goalDetail: goalDetailList) {
 			System.out.println(goalDetail.toString());
 		}
 	}

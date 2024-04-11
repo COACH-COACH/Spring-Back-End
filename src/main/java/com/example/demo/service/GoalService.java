@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.exception.GoalLimitExceededException;
 import com.example.demo.model.dto.GoalDto;
+import com.example.demo.model.dto.request.CreateGoalReqDto;
 import com.example.demo.model.dto.response.GoalListResDto;
-import com.example.demo.model.dto.response.GoalSatistics;
+import com.example.demo.model.dto.response.GoalSatisticsResDto;
 import com.example.demo.model.entity.Enroll;
 import com.example.demo.model.entity.Goal;
 import com.example.demo.model.entity.Product;
@@ -128,16 +131,16 @@ public class GoalService {
 		return enrollCost.floatValue() / goalCost.floatValue() * 100;
 	}
 
-	public List<GoalSatistics> getGoalStatList(String username) {
+	public List<GoalSatisticsResDto> getGoalStatList(String username) {
 		// 1. user의 라이프스테이지에 맞는 목표 가져오기
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
-	    List<GoalSatistics> statisticsList = new ArrayList<>();
+	    List<GoalSatisticsResDto> statisticsList = new ArrayList<>();
 	    
 	    // 2. statisticsList 초기화
         lifeStageGoals.getOrDefault(user.getLifeStage(), List.of()).forEach(goalName -> {
-            statisticsList.add(GoalSatistics.builder()
+            statisticsList.add(GoalSatisticsResDto.builder()
                     .goalName(goalName)
                     .goalRate(0.0f)
                     .goalAvgTargetAmt(BigDecimal.ZERO)
@@ -161,6 +164,30 @@ public class GoalService {
         }
 
         return statisticsList;
+	}
+	
+	public GoalDto addGoal(CreateGoalReqDto reqDto, String username) {
+	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
+        new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
+	    
+	    // TODO: 1. 현재 유저의 목표가 3개인 경우 추가 불가
+	    List<Goal> curGoalList = goalRepo.findByUserId(user.getId());
+	    if (curGoalList.size() >= 3) {
+	    	throw new GoalLimitExceededException("사용자는 최대 3개의 목표만 가질 수 있습니다.");
+	    }
+	    
+	    // 2. 아닌 경우 목표 추가
+		Goal newGoal = new Goal().builder()
+				.user(user)
+				.goalName(reqDto.getGoalName())
+				.targetCost(reqDto.getTargetCost())
+				.goalPeriod(reqDto.getGoalPeriod())
+				.startDate(new Date())
+				.accumulatedBalance(BigDecimal.ZERO)
+				.goalSt((byte) 0)
+				.build();
+		Goal result = goalRepo.save(newGoal);
+		return result.toDto();
 	}
 
 }
