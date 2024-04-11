@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -94,6 +95,8 @@ public class GoalService {
 	                .totalBalance(goal.getAccumulatedBalance())
 	                .enrollId(enroll.getId())
 	                .accumulatedBalance(enroll.getAccumulatedBalance())
+	                .goalRate(accurateGoalRate(enroll.getAccumulatedBalance(), goal.getTargetCost()))
+	                .accountNum(enroll.getAccountNum())
 	                .productId(product != null ? product.getId() : null) // product가 null이면 productId는 null
 	                .productName(product != null ? product.getProductName() : null) // product가 null이면 productName는 null
 	                .build();
@@ -105,6 +108,10 @@ public class GoalService {
 	            .fullName(user.getFullName())
 	            .goals(goalProductList)
 	            .build();
+	}
+	
+	private float accurateGoalRate(BigDecimal enrollCost, BigDecimal goalCost) {
+		return enrollCost.floatValue() / goalCost.floatValue() * 100;
 	}
 
 }

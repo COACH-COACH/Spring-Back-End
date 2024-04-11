@@ -25,6 +25,7 @@ public class EnrollDto {
 	private Date endDate;
 	private BigDecimal accumulatedBalance;
 	private Byte maturitySt;
+	private String accountNum;
 	
 	public Enroll toEntity() {
 		Enroll enroll = new Enroll();
@@ -33,6 +34,7 @@ public class EnrollDto {
 		enroll.setEndDate(this.getEndDate());
 		enroll.setAccumulatedBalance(this.getAccumulatedBalance());
 		enroll.setMaturitySt(this.getMaturitySt());
+		enroll.setAccountNum(this.getAccountNum());
 		return enroll;
 	}
 }

@@ -59,6 +59,9 @@ public class Enroll {
 	@Column(name="MATURITY_ST")
 	private Byte maturitySt;
 	
+	@Column(name="ACCOUNT_NUM")
+	private String accountNum;
+	
 	// toDto() : entity -> dto
 	public EnrollDto toDto() {
 		EnrollDto dto = new EnrollDto();
@@ -70,6 +73,7 @@ public class Enroll {
 		dto.setEndDate(this.getEndDate());
 		dto.setAccumulatedBalance(this.getAccumulatedBalance());
 		dto.setMaturitySt(this.getMaturitySt());
+		dto.setAccountNum(this.getAccountNum());
 		return dto;
 	}
 }

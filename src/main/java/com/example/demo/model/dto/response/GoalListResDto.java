@@ -38,6 +38,8 @@ public class GoalListResDto {
 		// 등록 관련 필드
 		int enrollId; // 상품 id
 		BigDecimal accumulatedBalance; // 상품 누적 금액
+		String accountNum; // 계좌번호
+		float goalRate; // 달성율(단위: %)
 		
 		// 상품 관련 필드 
 		int productId;// 상품 가입 번호
