@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 import jakarta.annotation.PostConstruct;
 
-@EnableMethodSecurity
 @SpringBootApplication
 public class CoachCoachApplication {
 	
@@ -20,7 +19,7 @@ public class CoachCoachApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CoachCoachApplication.class, args);
 		
-		System.out.println("0402 ");
+		System.out.println("END");
 	}
 	
 
