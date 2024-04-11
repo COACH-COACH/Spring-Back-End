@@ -8,5 +8,7 @@ import com.example.demo.model.entity.Goal;
 
 public interface GoalRepo extends JpaRepository<Goal, Integer> {
 	List<Goal> findByUserId(int userId);
+	
+	
 
 }
