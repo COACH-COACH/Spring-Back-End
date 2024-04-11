@@ -17,7 +17,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@ToString(of = {"id"})
 @Builder
 @Data   // RequiredArgsConstructor만 가져오기 때문 
 @NoArgsConstructor
