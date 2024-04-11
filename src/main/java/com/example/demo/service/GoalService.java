@@ -1,8 +1,11 @@
 package com.example.demo.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -10,13 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.exception.GoalLimitExceededException;
 import com.example.demo.model.dto.GoalDto;
+import com.example.demo.model.dto.request.CreateGoalReqDto;
 import com.example.demo.model.dto.response.GoalListResDto;
-import com.example.demo.model.dto.response.GoalListResDto.GoalAndProductDto;
+import com.example.demo.model.dto.response.GoalSatisticsResDto;
 import com.example.demo.model.entity.Enroll;
 import com.example.demo.model.entity.Goal;
 import com.example.demo.model.entity.Product;
 import com.example.demo.model.entity.User;
+import com.example.demo.model.enums.LifeStage;
 import com.example.demo.repository.EnrollRepo;
 import com.example.demo.repository.GoalRepo;
 import com.example.demo.repository.ProductRepo;
@@ -29,13 +35,25 @@ public class GoalService {
 	private EnrollRepo enrollRepo;
 	private ProductRepo productRepo;
 	
+	private final Map<LifeStage, List<String>> lifeStageGoals = new HashMap<>();
+	
 	@Autowired
 	public GoalService(GoalRepo goalRepo, UserRepo userRepo, EnrollRepo enrollRepo, ProductRepo productRepo) {
 		this.goalRepo = goalRepo;
 		this.userRepo = userRepo;
 		this.enrollRepo = enrollRepo;
 		this.productRepo = productRepo;
+		setLifeStageGoal();
 	}
+	
+	public void setLifeStageGoal() {
+        lifeStageGoals.put(LifeStage.UNI, List.of("학자금", "여행", "주택", "어학연수", "전자기기", "기타목돈"));
+        lifeStageGoals.put(LifeStage.NEW_JOB, List.of("자가마련", "자차마련", "결혼자금", "반려동물", "기타목돈"));
+        lifeStageGoals.put(LifeStage.NEW_WED, List.of("자가마련", "자차마련", "자녀준비", "투자비용", "기타목돈"));
+        lifeStageGoals.put(LifeStage.NO_CHILD, List.of("반려동물", "자가마련", "은퇴자금", "투자비용", "기타목돈"));
+        lifeStageGoals.put(LifeStage.HAVE_CHILD, List.of("자가마련", "자녀관련목돈", "은퇴자금", "투자비용", "기타목돈"));
+        lifeStageGoals.put(LifeStage.RETIR, List.of("건강", "창업비용", "취미", "자기계발", "기타목돈"));
+    }
 	
 	public List<GoalDto> getGoalListByUsername(String username) {
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
@@ -94,6 +112,8 @@ public class GoalService {
 	                .totalBalance(goal.getAccumulatedBalance())
 	                .enrollId(enroll.getId())
 	                .accumulatedBalance(enroll.getAccumulatedBalance())
+	                .goalRate(accurateGoalRate(enroll.getAccumulatedBalance(), goal.getTargetCost()))
+	                .accountNum(enroll.getAccountNum())
 	                .productId(product != null ? product.getId() : null) // product가 null이면 productId는 null
 	                .productName(product != null ? product.getProductName() : null) // product가 null이면 productName는 null
 	                .build();
@@ -105,6 +125,69 @@ public class GoalService {
 	            .fullName(user.getFullName())
 	            .goals(goalProductList)
 	            .build();
+	}
+	
+	private float accurateGoalRate(BigDecimal enrollCost, BigDecimal goalCost) {
+		return enrollCost.floatValue() / goalCost.floatValue() * 100;
+	}
+
+	public List<GoalSatisticsResDto> getGoalStatList(String username) {
+		// 1. user의 라이프스테이지에 맞는 목표 가져오기
+	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
+        new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
+	    
+	    List<GoalSatisticsResDto> statisticsList = new ArrayList<>();
+	    
+	    // 2. statisticsList 초기화
+        lifeStageGoals.getOrDefault(user.getLifeStage(), List.of()).forEach(goalName -> {
+            statisticsList.add(GoalSatisticsResDto.builder()
+                    .goalName(goalName)
+                    .goalRate(0.0f)
+                    .goalAvgTargetAmt(BigDecimal.ZERO)
+                    .build());
+        });
+		
+		// 3. 목표별 group by 해서 통계량 산출
+	    List<Object[]> results = goalRepo.findGoalStatistics();
+        for (Object[] result : results) {
+            String goalName = (String) result[0];
+            float goalRate = ((Number) result[1]).floatValue();
+            BigDecimal goalAvgTargetAmt = BigDecimal.valueOf(((Number) result[2]).doubleValue());
+
+            statisticsList.stream()
+                    .filter(stat -> stat.getGoalName().equals(goalName))
+                    .findFirst()
+                    .ifPresent(stat -> {
+                        stat.setGoalRate(goalRate);
+                        stat.setGoalAvgTargetAmt(goalAvgTargetAmt);
+                    });
+        }
+
+        return statisticsList;
+	}
+	
+	public GoalDto addGoal(CreateGoalReqDto reqDto, String username) {
+	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
+        new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
+	    
+	    // TODO: 1. 현재 유저의 목표가 3개인 경우 추가 불가
+	    List<Goal> curGoalList = goalRepo.findByUserId(user.getId());
+	    if (curGoalList.size() >= 3) {
+	    	throw new GoalLimitExceededException("사용자는 최대 3개의 목표만 가질 수 있습니다.");
+	    }
+	    
+	    // 2. 아닌 경우 목표 추가
+		Goal newGoal = new Goal().builder()
+				.user(user)
+				.goalName(reqDto.getGoalName())
+				.targetCost(reqDto.getTargetCost())
+				.goalPeriod(reqDto.getGoalPeriod())
+				.startDate(new Date())
+				.accumulatedBalance(BigDecimal.ZERO)
+				.goalSt((byte) 0)
+				.build();
+		Goal result = goalRepo.save(newGoal);
+		return result.toDto();
 	}
 
 }

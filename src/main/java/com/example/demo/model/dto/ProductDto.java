@@ -31,6 +31,7 @@ public class ProductDto {
 	private DepositCycle depositCycle;
 	private int maturity;
 	private ProductType productType;
+	private String productDetail;
 	
 	public Product toEntity() {
 		Product product = new Product();
@@ -48,6 +49,7 @@ public class ProductDto {
 		product.setDepositCycle(this.getDepositCycle());
 		product.setMaturity(this.getMaturity());
 		product.setProductType(this.getProductType());
+		product.setProductDetail(this.getProductDetail());
 		
 		return product;
 	}
