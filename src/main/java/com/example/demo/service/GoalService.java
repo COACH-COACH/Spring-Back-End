@@ -71,7 +71,8 @@ public class GoalService {
 	    }
 	    User user = userOptional.get();
 
-	    List<Goal> goals = goalRepo.findByUserId(user.getId());
+	    // 완료되지 않은 목표 조회
+	    List<Goal> goals = goalRepo.findByUserIdAndGoalSt(user.getId(), (byte) 0);
 	    if (goals.isEmpty()) {
 	        return new GoalListResDto(); // 목표가 없을 시 빈 객체 반환
 	    }
