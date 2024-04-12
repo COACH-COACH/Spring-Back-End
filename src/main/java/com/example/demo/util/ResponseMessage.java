@@ -13,4 +13,6 @@ public class ResponseMessage {
     public static final String READ_GOAL_SUCCESS = "회원 목표 조회 성공";
     public static final String CREATE_GOAL_SUCCESS = "회원 목표 생성 성공";
     public static final String CREATE_GOAL_FAIL = "회원 목표 생성 실패";
+    public static final String UPDATE_GOAL_SUCCESS = "회원 목표 수정 성공";
+    public static final String UPDATE_GOAL_FAIL = "회원 목표 수정 실패";
 }

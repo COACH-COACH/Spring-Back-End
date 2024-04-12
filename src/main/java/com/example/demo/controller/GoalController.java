@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,6 +79,16 @@ public class GoalController {
 	            .body(DefaultResponse.res(StatusCode.SERVICE_UNAVAILABLE, ResponseMessage.CREATE_GOAL_FAIL));
 	    }
 	}
-
+	
+	@PatchMapping("/complete/{goalId}")
+	public ResponseEntity<DefaultResponse<GoalDto>> completeGoal(@PathVariable int goalId) {
+		try {
+			GoalDto goalDto = goalService.updateGoalState(SecurityUtil.getUsername(), goalId);
+	        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.UPDATE_GOAL_SUCCESS, goalDto));
+		} catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(DefaultResponse.res(StatusCode.BAD_REQUEST, e.getMessage()));
+	    }
+	}
 
 }
