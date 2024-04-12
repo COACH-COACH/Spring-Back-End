@@ -172,7 +172,7 @@ public class GoalService {
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
 	    // TODO: 1. 현재 유저의 목표가 3개인 경우 추가 불가
-	    List<Goal> curGoalList = goalRepo.findByUserId(user.getId());
+	    List<Goal> curGoalList = goalRepo.findByUserIdAndGoalSt(user.getId(), (byte) 0);
 	    if (curGoalList.size() >= 3) {
 	    	throw new GoalLimitExceededException("사용자는 최대 3개의 목표만 가질 수 있습니다.");
 	    }
