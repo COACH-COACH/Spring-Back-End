@@ -15,7 +15,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
-public class GoalSatisticsResDto {
+public class GoalStatisticsResDto {
 	String goalName;
 	float goalRate;
 	BigDecimal goalAvgTargetAmt;

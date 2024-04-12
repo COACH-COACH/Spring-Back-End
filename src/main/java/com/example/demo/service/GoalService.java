@@ -17,7 +17,7 @@ import com.example.demo.exception.GoalLimitExceededException;
 import com.example.demo.model.dto.GoalDto;
 import com.example.demo.model.dto.request.CreateGoalReqDto;
 import com.example.demo.model.dto.response.GoalListResDto;
-import com.example.demo.model.dto.response.GoalSatisticsResDto;
+import com.example.demo.model.dto.response.GoalStatisticsResDto;
 import com.example.demo.model.entity.Enroll;
 import com.example.demo.model.entity.Goal;
 import com.example.demo.model.entity.Product;
@@ -71,7 +71,8 @@ public class GoalService {
 	    }
 	    User user = userOptional.get();
 
-	    List<Goal> goals = goalRepo.findByUserId(user.getId());
+	    // 완료되지 않은 목표 조회
+	    List<Goal> goals = goalRepo.findByUserIdAndGoalSt(user.getId(), (byte) 0);
 	    if (goals.isEmpty()) {
 	        return new GoalListResDto(); // 목표가 없을 시 빈 객체 반환
 	    }
@@ -131,16 +132,16 @@ public class GoalService {
 		return enrollCost.floatValue() / goalCost.floatValue() * 100;
 	}
 
-	public List<GoalSatisticsResDto> getGoalStatList(String username) {
+	public List<GoalStatisticsResDto> getGoalStatList(String username) {
 		// 1. user의 라이프스테이지에 맞는 목표 가져오기
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
-	    List<GoalSatisticsResDto> statisticsList = new ArrayList<>();
+	    List<GoalStatisticsResDto> statisticsList = new ArrayList<>();
 	    
 	    // 2. statisticsList 초기화
         lifeStageGoals.getOrDefault(user.getLifeStage(), List.of()).forEach(goalName -> {
-            statisticsList.add(GoalSatisticsResDto.builder()
+            statisticsList.add(GoalStatisticsResDto.builder()
                     .goalName(goalName)
                     .goalRate(0.0f)
                     .goalAvgTargetAmt(BigDecimal.ZERO)
@@ -171,7 +172,7 @@ public class GoalService {
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
 	    // TODO: 1. 현재 유저의 목표가 3개인 경우 추가 불가
-	    List<Goal> curGoalList = goalRepo.findByUserId(user.getId());
+	    List<Goal> curGoalList = goalRepo.findByUserIdAndGoalSt(user.getId(), (byte) 0);
 	    if (curGoalList.size() >= 3) {
 	    	throw new GoalLimitExceededException("사용자는 최대 3개의 목표만 가질 수 있습니다.");
 	    }

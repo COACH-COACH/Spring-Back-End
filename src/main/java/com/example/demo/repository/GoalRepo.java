@@ -9,6 +9,8 @@ import com.example.demo.model.entity.Goal;
 
 public interface GoalRepo extends JpaRepository<Goal, Integer> {
 	List<Goal> findByUserId(int userId);
+	
+	List<Goal> findByUserIdAndGoalSt(int userId, Byte goalSt);
 
 	@Query(value = "SELECT GOAL_NAME"
 			+ ", COUNT(*) / (SELECT COUNT(*) FROM GOAL_TB) * 100 AS ratio"
