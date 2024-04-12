@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,8 @@ import com.example.demo.util.DefaultResponse;
 import com.example.demo.util.ResponseMessage;
 import com.example.demo.util.SecurityUtil;
 import com.example.demo.util.StatusCode;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/goal")
@@ -80,6 +83,7 @@ public class GoalController {
 	    }
 	}
 	
+	// [메인 페이지] 목표 완료
 	@PatchMapping("/complete/{goalId}")
 	public ResponseEntity<DefaultResponse<GoalDto>> completeGoal(@PathVariable int goalId) {
 		try {
@@ -89,6 +93,18 @@ public class GoalController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(DefaultResponse.res(StatusCode.BAD_REQUEST, e.getMessage()));
 	    }
+	}
+	
+	// [메인 페이지?] 목표 제거
+	@DeleteMapping("/{goalId}")
+	public ResponseEntity removeGoal(@PathVariable int goalId) {
+		try {
+			goalService.deleteGoal(SecurityUtil.getUsername(), goalId);
+			return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.DELETE_GOAL_SUCCESS));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(DefaultResponse.res(StatusCode.BAD_REQUEST, ResponseMessage.DELETE_GOAL_FAIL));
+		}
 	}
 
 }

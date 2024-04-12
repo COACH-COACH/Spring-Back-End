@@ -196,7 +196,7 @@ public class GoalService {
 	public GoalDto updateGoalState(String username, int goalId) throws Exception {
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         	new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
-	    Goal goal = goalRepo.findById(goalId).orElseThrow(() -> 
+	    Goal goal = Optional.of(goalRepo.findByUserIdAndId(user.getId(), goalId)).orElseThrow(() -> 
 	    	new EntityNotFoundException("해당 목표가 존재하지 않습니다."));
 	    if (goal.getGoalSt() == (byte) 1) {
 	    	throw new Exception("이미 완료된 목표입니다.");
@@ -205,6 +205,19 @@ public class GoalService {
 	    goal.setGoalSt((byte) 1);
 	    goal.setEndDate(new Date());
 	    return goalRepo.save(goal).toDto();
+	}
+
+	public void deleteGoal(String username, int goalId) throws Exception {
+	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
+    		new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
+	    Goal goal = Optional.of(goalRepo.findByUserIdAndId(user.getId(), goalId)).orElseThrow(() -> 
+    		new EntityNotFoundException("해당 목표가 존재하지 않습니다."));
+	    
+		// 목표에 상품이 추가되어 있는 경우 
+	    if (goal.getEnroll() != null) {
+	    	throw new Exception("상품이 연결되어 있어 제거할 수 없습니다.");
+	    }
+	    goalRepo.deleteById(goalId);
 	}
 
 }

@@ -63,7 +63,7 @@ public class Goal {
 	
 	// 일대일 관계 - List 형태가 아니라 Enroll 형태
 	@OneToOne(mappedBy="goal", cascade = CascadeType.ALL)
-	private Enroll enrolls;
+	private Enroll enroll;
 	
 	// toDto() : entity -> dto
 	public GoalDto toDto() {
