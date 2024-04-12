@@ -35,18 +35,7 @@ public class UserController {
 		return userService.getUser(id);
 	}
 	
-	// 2. 데이터 삽입 // 
-//	@PostMapping("/join")
-//	public String addUser(@RequestBody UserDto userDto) {
-//		// @RequestBody는 json으로 들어오는 바디 데이터를 파싱하는 역할이라서
-//		// postman의 form-data로 보냈을 경우 에러남 - json으로 보내기
-//		
-//		userService.addUser(userDto);
-//		
-//		System.out.println("ok");
-//		return "ok";
-//	}
-	
+	// 2. 데이터 삽입 - 회원 가입// 	
 	@PostMapping("/join")
 	public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {
 		// @RequestBody는 json으로 들어오는 바디 데이터를 파싱하는 역할이라서
@@ -58,12 +47,21 @@ public class UserController {
 		return ResponseEntity.ok(userDto);
 	}
 	
-
-	
 	// 3. 데이터 삭제
 	@DeleteMapping("/{id}")
 	public void deleteUser(@PathVariable Integer id) {
 		userService.deleteUser(id);
 	}
 	
+	// 4. 다음 분기 소비 예측
+//	@PostMapping("/timeSeriesPrediction")
+//	public ResponseEntity<UserDto> timeSeriesPrediction(@RequestBody UserDto userDto) {
+//		// @RequestBody는 json으로 들어오는 바디 데이터를 파싱하는 역할이라서
+//		// postman의 form-data로 보냈을 경우 에러남 - json으로 보내기
+//		
+//		userService.addUser(userDto);
+//		
+//		System.out.println("ok");
+//		return ResponseEntity.ok(userDto);
+//	}
 }

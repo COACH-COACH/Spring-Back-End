@@ -67,7 +67,7 @@ public class User {
 
 	// 관계설정
 	
-	@OneToMany(mappedBy="user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
 	private List<Payment> payments;
 	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
 	private List<Goal> goals;

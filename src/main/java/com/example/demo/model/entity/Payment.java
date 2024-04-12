@@ -6,6 +6,8 @@ import com.example.demo.model.dto.PaymentDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -26,6 +28,7 @@ import lombok.NoArgsConstructor;
 public class Payment {
 	@Id
 	@Column(name="ID_PK")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	// FK, 1:M관계
