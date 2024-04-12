@@ -58,10 +58,11 @@ public class SecurityConfig {
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 				CorsConfiguration configuration = new CorsConfiguration();
 				
-			    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+			    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081"));
 			    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 			    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 			    configuration.setAllowCredentials(true); // 쿠키를 포함시킬지 여부
+			    configuration.addExposedHeader("Authorization");
 			    
 			    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 			    source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 설정 적용
