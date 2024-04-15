@@ -83,7 +83,7 @@ public class SecurityConfig {
         // 인가 작업
         // 해당 경로("/login", "/", "/user/join")에 대해 모든 사용자의 접근 허용
         http.authorizeHttpRequests((auth) -> auth
-		              .requestMatchers("/login", "/", "/user/join").permitAll() // 얘는 왜 /만 되는지 모르겠다.. '/login', 'user/join'안됨
+		              .requestMatchers("/login", "/*", "/user/join").permitAll() // 얘는 왜 /만 되는지 모르겠다.. '/login', 'user/join'안됨
 		              .anyRequest().authenticated()); // 나머지 주소는 authenticated 된 것만 접근 가능
         
         // 'JWTFilter'를 필터 체인에 등록 => 요청이 들어올 때마다 JWT 토큰의 유효성을 검증하도록 
