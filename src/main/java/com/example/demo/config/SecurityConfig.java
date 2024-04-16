@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.example.demo.jwt.JWTFilter;
 import com.example.demo.jwt.JWTUtil;
 import com.example.demo.jwt.LoginFilter;
+import com.example.demo.repository.UserRepo;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -31,10 +32,12 @@ public class SecurityConfig {
 	// AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
 	private final AuthenticationConfiguration authenticationConfiguration;
 	private final JWTUtil jwtUtil;
+	private final UserRepo urepo;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, UserRepo urepo) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
+        this.urepo = urepo;
     }
 
 	// AuthenticationManager Bean 등록
@@ -58,7 +61,9 @@ public class SecurityConfig {
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 				CorsConfiguration configuration = new CorsConfiguration();
 				
-			    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081"));
+
+			    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081", "http://localhost:8080", "http://localhost:5000"));
+
 			    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 			    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 			    configuration.setAllowCredentials(true); // 쿠키를 포함시킬지 여부
@@ -83,14 +88,15 @@ public class SecurityConfig {
         // 인가 작업
         // 해당 경로("/login", "/", "/user/join")에 대해 모든 사용자의 접근 허용
         http.authorizeHttpRequests((auth) -> auth
-		              .requestMatchers("/login", "/", "/user/join").permitAll() // 얘는 왜 /만 되는지 모르겠다.. '/login', 'user/join'안됨
+		              .requestMatchers("/login", "/", "/user/join", "/user/modify").permitAll() // 얘는 왜 /만 되는지 모르겠다.. '/login', 'user/join'안됨
+		              .requestMatchers("/user/timeSeriesPrediction/**").permitAll() // 동적 ID를 포함하는 경로 설정
 		              .anyRequest().authenticated()); // 나머지 주소는 authenticated 된 것만 접근 가능
         
         // 'JWTFilter'를 필터 체인에 등록 => 요청이 들어올 때마다 JWT 토큰의 유효성을 검증하도록 
         http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         
         // (1) addFilterAt으로 우리가 만든 LoginFilter를 등록
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, urepo), UsernamePasswordAuthenticationFilter.class);
 
 		// 세션 정책을 STATELESS로 설정: 세션을 사용하지 않고, 각 요청마다 인증을 확인
         // = RESTful API 서비스에 적합한 설정 = JWT 토큰 기반 인증 방식과 잘 맞음
