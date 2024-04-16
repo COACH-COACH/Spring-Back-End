@@ -57,6 +57,9 @@ public class ProductDocument {
 
     @Field(name = "PRODUCT_TYPE", type = FieldType.Keyword)
     private String productType;
+
+    @Field(name = "PRODUCT_DETAIL", type = FieldType.Keyword)
+    private String productDetail;
     
     public ProductDocumentDto toDto() {
         return ProductDocumentDto.builder()
@@ -73,6 +76,7 @@ public class ProductDocument {
             .depositCycle(this.getDepositCycle())
             .maturity(this.getMaturity())
             .productType(this.getProductType())
+            .productDetail(this.getProductDetail())
             .build();
     }
 
