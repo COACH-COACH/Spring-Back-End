@@ -18,4 +18,7 @@ public class ResponseMessage {
     public static final String UPDATE_GOAL_FAIL = "회원 목표 수정 실패";
     public static final String DELETE_GOAL_SUCCESS = "회원 목표 삭제 성공";
     public static final String DELETE_GOAL_FAIL = "회원 목표 삭제 실패";
+    
+
+    public static final String READ_PRODUCT_SUCCESS = "상품 조회 성공";
 }
