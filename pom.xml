@@ -124,6 +124,11 @@
 		    <groupId>org.springframework.data</groupId>
 		    <artifactId>spring-data-elasticsearch</artifactId>
 		</dependency>
+	    <dependency>
+	    	<groupId>com.fisa</groupId>
+	    	<artifactId>workmanager</artifactId>
+	    	<version>0.0.1-SNAPSHOT</version>
+	    </dependency>
 	</dependencies>
 	
 	<build>
