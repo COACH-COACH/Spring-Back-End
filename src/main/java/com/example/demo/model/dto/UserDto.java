@@ -32,6 +32,7 @@ public class UserDto {
 	private String region;
 	private Date registDate;
 	private LifeStage lifeStage;
+	private Boolean activeStatus;
 	
 	public User toEntity() {
 		User user = new User();
@@ -45,6 +46,7 @@ public class UserDto {
 		user.setRegion(this.getRegion());
 		user.setRegistDate(this.getRegistDate());
 		user.setLifeStage(this.getLifeStage());
+		user.setActiveStatus(this.getActiveStatus());
 		return user;
 	}
 

@@ -65,8 +65,10 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private LifeStage lifeStage;
 
-	// 관계설정
+	@Column(name="ACTIVE_STATUS")
+	private Boolean activeStatus;
 	
+	// 관계설정
 	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
 	private List<Payment> payments;
 	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
@@ -86,6 +88,7 @@ public class User {
 		dto.setBirthDate(this.getBirthDate());
 		dto.setRegion(this.getRegion());
 		dto.setLifeStage(this.getLifeStage());
+		dto.setActiveStatus(this.getActiveStatus());
 		
 		return dto;
 	}

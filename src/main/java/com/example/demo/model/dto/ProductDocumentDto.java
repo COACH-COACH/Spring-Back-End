@@ -24,6 +24,7 @@ public class ProductDocumentDto {
     private String depositCycle;
     private int maturity;
     private String productType;
+    private String productDetail;
     
     public ProductDocument toEntity() {
         return ProductDocument.builder()
@@ -40,6 +41,7 @@ public class ProductDocumentDto {
             .depositCycle(this.getDepositCycle())
             .maturity(this.getMaturity())
             .productType(this.getProductType())
+            .productDetail(this.getProductDetail())
             .build();
     }
 }

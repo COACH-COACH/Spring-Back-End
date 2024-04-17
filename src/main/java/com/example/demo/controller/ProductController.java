@@ -2,18 +2,31 @@ package com.example.demo.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.model.document.ProductDocument;
 import com.example.demo.model.dto.ProductDocumentDto;
 import com.example.demo.model.dto.response.ProductRecommendationDto;
 import com.example.demo.service.ProductService;
 import com.example.demo.util.SecurityUtil;
+import com.example.demo.model.dto.request.SearchProductReqDto;
+import com.example.demo.model.dto.response.PagenationResDto;
+import com.example.demo.service.ProductService;
+import com.example.demo.util.DefaultResponse;
+import com.example.demo.util.ResponseMessage;
+import com.example.demo.util.StatusCode;
 
 @RestController
 @RequestMapping("/product")
@@ -25,6 +38,7 @@ public class ProductController {
 		this.productService = productService;
 	}
 	
+	// Test API
 	@GetMapping("/") 
 	public List<ProductDocumentDto> getAllProduct() {
 		return productService.getAllProduct();
@@ -43,6 +57,31 @@ public class ProductController {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error getting recommendations", e);
 //			return ResponseEntity.internalServerError().build();
 		}
+	}
+
+	// 상품 검색
+	@PostMapping("/search")
+	public ResponseEntity<DefaultResponse<Map<String, Object>>> searchProductList(
+	    @RequestBody SearchProductReqDto criteria, 
+	    @PageableDefault(page = 0, size = 10) Pageable pageable) {
+
+	    try {
+	        Page<ProductDocument> result = productService.searchProducts(criteria, pageable);
+	        Map<String, Object> data = new HashMap<>();
+	        data.put("products", result.getContent()); // 실제 데이터 리스트
+	        new PagenationResDto();
+			data.put("pagenation", PagenationResDto.builder()
+					.totalElements(result.getTotalElements())
+	        		.totalPages(result.getTotalPages())
+	        		.currentPage(result.getNumber())
+	        		.pageSize(result.getSize())
+	        		.build());
+
+	        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.READ_PRODUCT_SUCCESS, data));
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body(DefaultResponse.res(StatusCode.BAD_REQUEST, e.getMessage()));
+	    }
 	}
 
 }

@@ -10,10 +10,12 @@ import com.example.demo.model.dto.ProductDocumentDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
+@ToString
 @Builder
 @Getter @Setter
 @Document(indexName = "products")
@@ -31,7 +33,7 @@ public class ProductDocument {
     @Field(name = "MAX_INTEREST_RATE", type = FieldType.Double)
     private BigDecimal maxInterestRate;
 
-    @Field(name = "CREATE_DATE", type = FieldType.Date, format = {}, pattern = "uuuu-MM-dd HH:mm:ss.SSSSSS")
+    @Field(name = "CREATE_DATE", type = FieldType.Date, format = {}, pattern = "uuuu-MM-dd H:mm:ss")
     private Date createDate;
 
     @Field(name = "PREFER_CONDITION", type = FieldType.Text)
@@ -57,6 +59,9 @@ public class ProductDocument {
 
     @Field(name = "PRODUCT_TYPE", type = FieldType.Keyword)
     private String productType;
+
+    @Field(name = "PRODUCT_DETAIL", type = FieldType.Keyword)
+    private String productDetail;
     
     public ProductDocumentDto toDto() {
         return ProductDocumentDto.builder()
@@ -73,6 +78,7 @@ public class ProductDocument {
             .depositCycle(this.getDepositCycle())
             .maturity(this.getMaturity())
             .productType(this.getProductType())
+            .productDetail(this.getProductDetail())
             .build();
     }
 

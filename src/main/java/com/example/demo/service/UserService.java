@@ -2,15 +2,21 @@ package com.example.demo.service;
 //import java.util.Optional;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.model.dto.PaymentDto;
 import com.example.demo.model.dto.UserDto;
+import com.example.demo.model.entity.Payment;
 import com.example.demo.model.entity.User;
 import com.example.demo.model.enums.LifeStage;
 import com.example.demo.model.enums.Sex;
+import com.example.demo.repository.PaymentRepo;
 import com.example.demo.repository.UserRepo;
 //import lombok.extern.slf4j.Slf4j;
 
@@ -19,12 +25,13 @@ import com.example.demo.repository.UserRepo;
 public class UserService {
 	
 	private final UserRepo urepo;
+	private final PaymentRepo prepo;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Autowired
-	public UserService(UserRepo urepo, BCryptPasswordEncoder bCryptPasswordEncoder) {
-
+	public UserService(UserRepo urepo, PaymentRepo prepo, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.urepo = urepo;
+        this.prepo = prepo;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 	
@@ -51,6 +58,7 @@ public class UserService {
     	String region = dto.getRegion();
     	Date registDate = new Date();
     	LifeStage lifeStage = dto.getLifeStage();
+    	Boolean activeStatus = true;
 
         Boolean isExist = urepo.existsByLoginId(loginId);
         
@@ -69,8 +77,31 @@ public class UserService {
         data.setRegion(region);
         data.setRegistDate(registDate);
         data.setLifeStage(lifeStage);
+        data.setActiveStatus(activeStatus);
 
         urepo.save(data);
+    }
+	
+	public void updateUser(String username, UserDto userDto) {
+        Optional<User> optionalUser = Optional.ofNullable(urepo.findByLoginId(username));
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            // DTO에서 변경된 필드만 업데이트
+            if (userDto.getLoginPw() != null) {
+                user.setLoginPw(bCryptPasswordEncoder.encode(userDto.getLoginPw()));
+            }
+
+            if (userDto.getLifeStage() != null) {
+                user.setLifeStage(userDto.getLifeStage());
+            }
+
+            // 변경된 필드를 저장
+            urepo.save(user);
+        } else {
+            throw new IllegalArgumentException("User not found with ID: " + username);
+        }
     }
 	
 	public UserDto getUser(Integer id) {
@@ -78,8 +109,36 @@ public class UserService {
 		return user.toDto();
 	}
 	
+	// 특정 CUSTOMER_ID_FK 값에 해당하는 정보들을 PAYMENT_TB에서 조회
+    public List<PaymentDto> getPaymentsByCustomerId(int customerId) {
+        List<Payment> payments = prepo.findByUser_Id(customerId);
+        return payments.stream()
+                       .map(Payment::toDto)
+                       .collect(Collectors.toList());
+    }
+    
+    public int getUserId(String username) {
+    	User user = urepo.findByLoginId(username);
+    	return user.toDto().getId();
+    }
+	
 	public void deleteUser(Integer id) {
 		urepo.deleteById(id);
+	}
+
+	public void deactivateUser(String username) {
+		Optional<User> optionalUser = Optional.ofNullable(urepo.findByLoginId(username));
+		
+		if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            user.setActiveStatus(false);
+
+            // 변경된 필드를 저장
+            urepo.save(user);
+        } else {
+            throw new IllegalArgumentException("Unable to deactivate ; " + username);
+        }
 	}
 
 }
