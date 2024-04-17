@@ -7,7 +7,9 @@ import com.example.demo.model.document.ProductDocument;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
+@ToString
 @Data
 @Builder
 public class ProductDocumentDto {
