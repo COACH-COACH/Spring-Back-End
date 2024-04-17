@@ -1,10 +1,9 @@
 package com.example.demo.model.dto.response;
 
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,45 +18,31 @@ import lombok.ToString;
 @NoArgsConstructor
 @Getter @Setter
 public class ProductRecommendationDto {
-	@JsonProperty("ID_PK")
-	private int idPk;
+	private List<ItemRecommendationDto> clusterRecommendations;
+	private List<ItemRecommendationDto> itemRecommendations;
+	private List<ItemRecommendationDto> staticRecommendations;
 	
-	@JsonProperty("PRODUCT_NAME")
-	private String productName;
+	// Getter & Setter
 	
-	@JsonProperty("MAX_INTEREST_RATE")
-	private int maxInterestRate;
-	
-	@JsonProperty("MATURITY")
-	private int maturity;
-	
-//	public Integer getId() {
-//		return idPk;
-//	}
-//	public void setId(int idPk) {
-//		this.idPk = idPk;
-//	}
-//	
-//	public String getProductName(){
-//		return productName;
-//	}
-//	public void setProductName(String productName) {
-//		this.productName = productName;
-//	}
-//	
-//	public int getMaxInterestRate() {
-//		return maxInterestRate;
-//	}
-//	public void setMaxInterestRage(int maxInterestRate) {
-//		this.maxInterestRate = maxInterestRate;
-//	}
-//	
-//	public int getMaturity() {
-//		return maturity;
-//	}
-//	public void setMaturity(int maturity) {
-//		this.maturity = maturity;
-//	}
+	// 내부 클래스
+	@ToString
+	@Builder
+	@Getter @Setter
+	public static class ItemRecommendationDto{
+		private int idPk;
+		private int maturity;
+		private BigDecimal maxInterestRate;
+		private String productName;
+		
+		public ItemRecommendationDto() {}
+		
+		public ItemRecommendationDto(int idPk, int maturity, BigDecimal maxInterestRate, String productName) {
+			this.idPk = idPk;
+			this.maturity = maturity;
+			this.maxInterestRate = maxInterestRate;
+			this.productName = productName;
+		}
+	}
 }
 
 

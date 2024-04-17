@@ -45,17 +45,14 @@ public class ProductController {
 	}
 	
 	@GetMapping("/recommend")
-	public HashMap getRecommendations(){
+	public ProductRecommendationDto getRecommendations(){
 		String username = SecurityUtil.getUsername();
 		int userId = productService.getUserId(username);
 		
 		try {
 			return productService.getRecommendations(userId);
-//			List<ProductRecommendationDto> recommendations = productService.getRecommendations(userId);
-//			return ResponseEntity.ok(recommendations);
 		} catch (Exception  e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error getting recommendations", e);
-//			return ResponseEntity.internalServerError().build();
 		}
 	}
 

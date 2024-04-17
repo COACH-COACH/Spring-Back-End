@@ -1,7 +1,11 @@
 package com.example.demo.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -27,6 +31,8 @@ import com.example.demo.repository.UserRepo;
 import com.example.demo.model.entity.User;
 
 import com.example.demo.model.dto.request.SearchProductReqDto;
+import com.example.demo.model.dto.response.ProductRecommendationDto;
+import com.example.demo.model.dto.response.ProductRecommendationDto.ItemRecommendationDto;;
 
 @Service
 public class ProductService {
@@ -52,12 +58,45 @@ public class ProductService {
             .collect(Collectors.toList()); // 결과를 List로 수집
 	}
 	
-	public HashMap getRecommendations(int userId){
+	// flask에서 추천된 상품 json파일 가져오기
+	public ProductRecommendationDto getRecommendations(int userId){
 		String url = "http://localhost:5000/recommendation/" + userId;
 		ResponseEntity<HashMap> response = restTemplate.getForEntity(url, HashMap.class);  
-		return response.getBody();
+		HashMap<String, List<HashMap>> rawData = response.getBody();
+		
+		return mapToProductRecommendationDto(rawData);
 	}
+    private ProductRecommendationDto mapToProductRecommendationDto(HashMap<String, List<HashMap>> rawData) {
+        ProductRecommendationDto dto = ProductRecommendationDto.builder()
+                .clusterRecommendations(getItemRecommendationList(rawData, "cluster_recommendations"))
+                .itemRecommendations(getItemRecommendationList(rawData, "item_recommendations"))
+                .staticRecommendations(getItemRecommendationList(rawData, "static_recommendations"))
+                .build();
+        return dto;
+    }
 
+    private List<ItemRecommendationDto> getItemRecommendationList(HashMap<String, List<HashMap>> rawData, String key) {
+        if (rawData != null && rawData.containsKey(key)) {
+            List<HashMap> maps = rawData.get(key);
+            List<ItemRecommendationDto> items = new ArrayList<>();
+            for (HashMap<String, Object> map : maps) {
+                items.add(mapToItemRecommendationDto(map));
+            }
+            return items;
+        }
+        return new ArrayList<>();
+    }
+
+    private ItemRecommendationDto mapToItemRecommendationDto(HashMap<String, Object> rawData) {
+        return ItemRecommendationDto.builder()
+                .idPk((Integer) rawData.get("ID_PK"))
+                .maturity((Integer) rawData.get("MATURITY"))
+                .maxInterestRate(new BigDecimal(String.valueOf(rawData.get("MAX_INTEREST_RATE"))))
+                .productName((String) rawData.get("PRODUCT_NAME"))
+                .build();
+}
+
+    // 접속한 고객의 userId 가져오기
 	public int getUserId(String loginId) {
 		User user = userRepo.findByLoginId(loginId);
 		if (user == null) {
