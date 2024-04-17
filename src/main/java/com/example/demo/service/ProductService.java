@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -73,4 +74,12 @@ public class ProductService {
         
         return new PageImpl<>(searchHitsContent, pageable, searchHits.getTotalHits());
     }
+
+	public ProductDocument getProductDetail(String productId) throws Exception {
+		Optional<ProductDocument> res = productDocumentRepo.findById(productId);
+		if (!res.isPresent()) {
+			throw new Exception("상품 ID가 존재하지 않습니다.");
+		}
+		return res.get();
+	}
 }
