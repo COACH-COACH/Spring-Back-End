@@ -26,7 +26,7 @@ public class EnrollDto {
 	private BigDecimal accumulatedBalance;
 	private Byte maturitySt;
 	private String accountNum;
-	private BigDecimal depositBalance;
+	private BigDecimal depositAmtCycle;
 	
 	public Enroll toEntity() {
 		Enroll enroll = new Enroll();
@@ -36,7 +36,7 @@ public class EnrollDto {
 		enroll.setAccumulatedBalance(this.getAccumulatedBalance());
 		enroll.setMaturitySt(this.getMaturitySt());
 		enroll.setAccountNum(this.getAccountNum());
-		enroll.setDepositBalance(this.getDepositBalance());
+		enroll.setDepositAmtCycle(this.getDepositAmtCycle());
 		return enroll;
 	}
 }

@@ -62,8 +62,8 @@ public class Enroll {
 	@Column(name="ACCOUNT_NUM")
 	private String accountNum;
 	
-	@Column(name="DEPOSIT_BALANCE")
-	private BigDecimal depositBalance;
+	@Column(name="DEPOSIT_AMOUNT_CYCLE")
+	private BigDecimal depositAmtCycle;
 	
 	// toDto() : entity -> dto
 	public EnrollDto toDto() {
@@ -77,7 +77,7 @@ public class Enroll {
 		dto.setAccumulatedBalance(this.getAccumulatedBalance());
 		dto.setMaturitySt(this.getMaturitySt());
 		dto.setAccountNum(this.getAccountNum());
-		dto.setDepositBalance(this.getDepositBalance());
+		dto.setDepositAmtCycle(this.getDepositAmtCycle());
 		return dto;
 	}
 }
