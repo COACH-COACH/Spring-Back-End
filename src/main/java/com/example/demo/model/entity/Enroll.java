@@ -62,6 +62,9 @@ public class Enroll {
 	@Column(name="ACCOUNT_NUM")
 	private String accountNum;
 	
+	@Column(name="DEPOSIT_BALANCE")
+	private BigDecimal depositBalance;
+	
 	// toDto() : entity -> dto
 	public EnrollDto toDto() {
 		EnrollDto dto = new EnrollDto();
@@ -74,6 +77,7 @@ public class Enroll {
 		dto.setAccumulatedBalance(this.getAccumulatedBalance());
 		dto.setMaturitySt(this.getMaturitySt());
 		dto.setAccountNum(this.getAccountNum());
+		dto.setDepositBalance(this.getDepositBalance());
 		return dto;
 	}
 }
