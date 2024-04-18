@@ -16,9 +16,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.model.document.ProductDocument;
 import com.example.demo.model.dto.ProductDocumentDto;
+import com.example.demo.model.dto.response.ProductRecommendationDto;
+import com.example.demo.service.ProductService;
+import com.example.demo.util.SecurityUtil;
 import com.example.demo.model.dto.request.SearchProductReqDto;
 import com.example.demo.model.dto.response.PagenationResDto;
 import com.example.demo.service.ProductService;
@@ -42,6 +46,19 @@ public class ProductController {
 		return productService.getAllProduct();
 	}
 	
+	// 상품 추천
+	@GetMapping("/recommend")
+	public ProductRecommendationDto getRecommendations(){
+		String username = SecurityUtil.getUsername();
+		int userId = productService.getUserId(username);
+		
+		try {
+			return productService.getRecommendations(userId);
+		} catch (Exception  e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error getting recommendations", e);
+		}
+	}
+
 	public ProductDocument transformProductData(ProductDocument product) {
         if ("DEPOSIT".equals(product.getProductType())) {
             product.setProductType("예금");
