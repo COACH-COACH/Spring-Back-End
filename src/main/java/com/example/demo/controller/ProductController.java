@@ -44,6 +44,7 @@ public class ProductController {
 		return productService.getAllProduct();
 	}
 	
+	// 
 	@GetMapping("/recommend")
 	public ProductRecommendationDto getRecommendations(){
 		String username = SecurityUtil.getUsername();
