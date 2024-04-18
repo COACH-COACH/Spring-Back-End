@@ -108,7 +108,7 @@ public class ProductController {
 	    }
 	}
 	
-	@GetMapping("/search/detail/{productId}")
+	@GetMapping("/detail/{productId}")
 	public ResponseEntity<DefaultResponse<ProductDocument>> searchProductDetail(@PathVariable String productId) {
 		try {
 			ProductDocument result = productService.getProductDetail(productId);
