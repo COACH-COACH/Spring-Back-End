@@ -1,6 +1,5 @@
 package com.example.demo.model.entity;
 import java.math.BigDecimal;
-//import java.util.List;
 import java.util.Date;
 
 import com.example.demo.model.dto.EnrollDto;

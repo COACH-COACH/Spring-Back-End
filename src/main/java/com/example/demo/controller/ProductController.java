@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -19,10 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.model.document.ProductDocument;
-import com.example.demo.model.dto.ProductDocumentDto;
-import com.example.demo.model.dto.response.ProductRecommendationDto;
+import com.example.demo.model.dto.response.RecommendationResDto;
 import com.example.demo.service.ProductService;
 import com.example.demo.util.SecurityUtil;
+import com.example.demo.model.dto.ProductDocumentDto;
+import com.example.demo.model.dto.request.RecommendationProductReqDto;
 import com.example.demo.model.dto.request.SearchProductReqDto;
 import com.example.demo.model.dto.response.PagenationResDto;
 import com.example.demo.service.ProductService;
@@ -36,6 +39,7 @@ public class ProductController {
 	
 	private final ProductService productService;
 	
+//	@Autowired
 	public ProductController(ProductService productService) {
 		this.productService = productService;
 	}
@@ -48,7 +52,7 @@ public class ProductController {
 	
 	// 상품 추천
 	@GetMapping("/recommend")
-	public ProductRecommendationDto getRecommendations(){
+	public RecommendationResDto getRecommendations(){
 		String username = SecurityUtil.getUsername();
 		int userId = productService.getUserId(username);
 		
@@ -118,6 +122,24 @@ public class ProductController {
 	                .body(DefaultResponse.res(StatusCode.BAD_REQUEST, e.getMessage()));
 		}
 	}
+	
 
+	// 상품과 목표 연동
+	
+	
+	
+	
+	// 상품 가입
+	@PostMapping("/register/{productId}/{goalId}")
+	public ResponseEntity<Void> registerProduct(@PathVariable int productId,
+												@PathVariable int goalId,
+												@RequestBody RecommendationProductReqDto requestDto){
+		String username = SecurityUtil.getUsername();
+		int userId = productService.getUserId(username);
+		productService.registerProduct(userId, productId, goalId, requestDto);
+		return ResponseEntity.ok().build();
+	}
+	
+	
 }
 
