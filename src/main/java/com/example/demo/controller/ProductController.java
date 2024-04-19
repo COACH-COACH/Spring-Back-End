@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -122,11 +123,23 @@ public class ProductController {
 		}
 	}
 	
+
+	// 상품과 목표 연동
+	
+	
+	
+	
 	// 상품 가입
-	@PostMapping("/register")
-	public ResponseEntity<Void> registerProduct(@RequestBody RecommendationProductReqDto requestDto){
-		productService.registerProduct(requestDto);
+	@PostMapping("/register/{productId}/{goalId}")
+	public ResponseEntity<Void> registerProduct(@PathVariable int productId,
+												@PathVariable int goalId,
+												@RequestBody RecommendationProductReqDto requestDto){
+		String username = SecurityUtil.getUsername();
+		int userId = productService.getUserId(username);
+		productService.registerProduct(userId, productId, goalId, requestDto);
 		return ResponseEntity.ok().build();
 	}
+	
+	
 }
 

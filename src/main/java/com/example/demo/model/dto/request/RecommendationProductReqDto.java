@@ -16,9 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter @Setter
 public class RecommendationProductReqDto {
-	private int userIdFk;				// 고객 idFk
-	private int productIdFk;			// 상품 idFk
-	private int goalIdFk;				// 목표 idFk
+//	private int userIdFk;				// 고객 idFk
     
 //	@NotNull(message = "입금액은 필수입니다.")
 //  @Min(value = 1000, message = "입금액은 1000보다 커야 합니다.") -> 프론트에서 제한하기
