@@ -62,6 +62,9 @@ public class Enroll {
 	@Column(name="ACCOUNT_NUM")
 	private String accountNum;
 	
+	@Column(name="DEPOSIT_AMOUNT_CYCLE")
+	private BigDecimal depositAmountCycle;
+	
 	// toDto() : entity -> dto
 	public EnrollDto toDto() {
 		EnrollDto dto = new EnrollDto();

@@ -17,7 +17,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
-public class ProductRecommendationDto {
+public class RecommendationResDto {
 	private List<ItemRecommendationDto> clusterRecommendations;
 	private List<ItemRecommendationDto> itemRecommendations;
 	private List<ItemRecommendationDto> staticRecommendations;
