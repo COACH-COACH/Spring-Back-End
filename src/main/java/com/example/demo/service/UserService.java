@@ -4,6 +4,7 @@ package com.example.demo.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,19 +36,20 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 	
-
-//	@Transactional
-//	public void addUser(UserDto dto) {
-//		User user = dto.toEntity();
-//		
-//		if (urepo.findById(user.getId()).isPresent()) {
-//			throw new RuntimeException("이미 존재하는 사용자입니다.");
-//		}
-//		// 저장
-//		urepo.saveAndFlush(user);
-//	}
+	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int LENGTH = 20;
+    private Random random = new Random();
+    
+	private String createSeq() {
+		StringBuilder sb = new StringBuilder(LENGTH);
+        for (int i = 0; i < LENGTH; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(index));
+        }
+        return sb.toString();
+	}
 	
-	public void addUser(UserDto dto) {
+	public UserDto addUser(UserDto dto) throws Exception {
 
 		String seq = null;
         String loginId = dto.getLoginId();
@@ -56,14 +58,13 @@ public class UserService {
     	Sex sex = dto.getSex();
     	Date birthDate = dto.getBirthDate();
     	String region = dto.getRegion();
-    	Date registDate = new Date();
     	LifeStage lifeStage = dto.getLifeStage();
     	Boolean activeStatus = true;
 
         Boolean isExist = urepo.existsByLoginId(loginId);
         
         if (isExist) {
-            return;
+            throw new Exception("이미 존재하는 아이디입니다.");
         }
 
         User data = new User();
@@ -75,11 +76,12 @@ public class UserService {
         data.setSex(sex);
         data.setBirthDate(birthDate);
         data.setRegion(region);
-        data.setRegistDate(registDate);
+        data.setRegistDate(new Date());
         data.setLifeStage(lifeStage);
         data.setActiveStatus(activeStatus);
+        data.setSeq(createSeq());
 
-        urepo.save(data);
+        return urepo.save(data).toDto();
     }
 	
 	public void updateUser(String username, UserDto userDto) {
