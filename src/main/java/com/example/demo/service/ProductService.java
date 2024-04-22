@@ -47,6 +47,7 @@ import com.example.demo.model.entity.User;
 import com.example.demo.model.enums.ProductType;
 import com.example.demo.model.dto.request.RecommendationProductReqDto;
 import com.example.demo.model.dto.request.SearchProductReqDto;
+import com.example.demo.model.dto.response.ConnectGoalwithProductResDto;
 import com.example.demo.model.dto.response.RecommendationResDto;
 import com.example.demo.model.dto.response.RecommendationResDto.ItemRecommendationDto;;
 
@@ -187,8 +188,29 @@ public class ProductService {
 	}
 	
 	
-	// 상품 가입 - 상품과 목표 연동
-	
+	// 상품 가입 - 상품과 목표 연동을 위한 목표 list
+	@Transactional
+	public ConnectGoalwithProductResDto connectGoalwithProduct(int userId) {
+		// status 0인 목표만 가져오기
+		List<Goal> goals = goalRepo.findByUserIdAndGoalSt(userId, (byte) 0);
+		// dto에 저장하기
+		List<ConnectGoalwithProductResDto.GoalListDto> goalListDto = new ArrayList<>();
+		for (Goal goal : goals) {
+			ConnectGoalwithProductResDto.GoalListDto dto = ConnectGoalwithProductResDto.GoalListDto.builder()
+					.goalId(goal.getId())
+					.goalName(goal.getGoalName())
+					.targetCost(goal.getTargetCost())
+					.startDate(goal.getStartDate())
+					.build();
+		goalListDto.add(dto);
+		}
+		
+		ConnectGoalwithProductResDto responseDto = ConnectGoalwithProductResDto.builder()
+				.goals(goalListDto)
+				.build();
+
+		return responseDto;
+	}
 	
 	// 상품 가입 - DB에 저장
 	@Transactional

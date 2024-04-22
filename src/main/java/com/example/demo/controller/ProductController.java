@@ -27,6 +27,7 @@ import com.example.demo.util.SecurityUtil;
 import com.example.demo.model.dto.ProductDocumentDto;
 import com.example.demo.model.dto.request.RecommendationProductReqDto;
 import com.example.demo.model.dto.request.SearchProductReqDto;
+import com.example.demo.model.dto.response.ConnectGoalwithProductResDto;
 import com.example.demo.model.dto.response.PagenationResDto;
 import com.example.demo.service.ProductService;
 import com.example.demo.util.DefaultResponse;
@@ -123,10 +124,14 @@ public class ProductController {
 		}
 	}
 	
-
-	// 상품과 목표 연동
-	
-	
+	// 프론트에 목표 리스트 전달
+	@GetMapping("/connect")
+	public ResponseEntity<ConnectGoalwithProductResDto> connectGoalwithProduct(){
+		String username = SecurityUtil.getUsername();
+		int userId = productService.getUserId(username);
+		ConnectGoalwithProductResDto responseDto = productService.connectGoalwithProduct(userId);
+		return ResponseEntity.ok(responseDto);
+	}
 	
 	
 	// 상품 가입
@@ -136,6 +141,8 @@ public class ProductController {
 												@RequestBody RecommendationProductReqDto requestDto){
 		String username = SecurityUtil.getUsername();
 		int userId = productService.getUserId(username);
+		
+		// 가입된 상품 DB에 저장하기
 		productService.registerProduct(userId, productId, goalId, requestDto);
 		return ResponseEntity.ok().build();
 	}
