@@ -37,19 +37,6 @@ public class GoalController {
 		this.goalService = goalService;
 	}
 	
-	// Test API
-	@GetMapping("/list")
-	public ResponseEntity<DefaultResponse<List<GoalDto>>> getGoalList() {
-	    String username = SecurityUtil.getUsername();
-	    List<GoalDto> goalList = goalService.getGoalListByUsername(username);
-	    DefaultResponse<List<GoalDto>> response = DefaultResponse.res(
-	        HttpStatus.OK.value(), // 응답 코드
-	        ResponseMessage.READ_GOAL_SUCCESS, // 메시지
-	        goalList // 데이터
-	    );
-	    return ResponseEntity.ok(response);
-	}
-	
 	// [메인 페이지] 회원 목표 조회
 	@GetMapping("/product/list")
 	public ResponseEntity<DefaultResponse<GoalListResDto>> getGoalProductList() {
