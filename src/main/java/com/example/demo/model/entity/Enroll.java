@@ -64,6 +64,9 @@ public class Enroll {
 	@Column(name="DEPOSIT_AMOUNT_CYCLE")
 	private BigDecimal depositAmtCycle;
 	
+	@Column(name="TARGET_COST")
+	private BigDecimal targetCost;
+	
 	// toDto() : entity -> dto
 	public EnrollDto toDto() {
 		EnrollDto dto = new EnrollDto();
@@ -77,6 +80,7 @@ public class Enroll {
 		dto.setMaturitySt(this.getMaturitySt());
 		dto.setAccountNum(this.getAccountNum());
 		dto.setDepositAmtCycle(this.getDepositAmtCycle());
+		dto.setTargetCost(this.getTargetCost());
 		return dto;
 	}
 }

@@ -27,6 +27,7 @@ public class EnrollDto {
 	private Byte maturitySt;
 	private String accountNum;
 	private BigDecimal depositAmtCycle;
+	private BigDecimal targetCost;
 	
 	public Enroll toEntity() {
 		Enroll enroll = new Enroll();
@@ -37,6 +38,7 @@ public class EnrollDto {
 		enroll.setMaturitySt(this.getMaturitySt());
 		enroll.setAccountNum(this.getAccountNum());
 		enroll.setDepositAmtCycle(this.getDepositAmtCycle());
+		enroll.setTargetCost(this.getTargetCost());
 		return enroll;
 	}
 }

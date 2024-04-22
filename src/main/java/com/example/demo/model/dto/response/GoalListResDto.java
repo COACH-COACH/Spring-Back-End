@@ -37,6 +37,7 @@ public class GoalListResDto {
 		BigDecimal accumulatedBalance; // 상품 누적 금액
 		String accountNum; // 계좌번호
 		float goalRate; // 달성율(단위: %)
+		BigDecimal targetCost; // 목표금액
 		
 		// 실천방안 관련 필드(자유적금일 경우)
 		String actionPlan; // 실천 방안
