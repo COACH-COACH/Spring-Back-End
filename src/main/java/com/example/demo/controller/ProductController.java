@@ -91,7 +91,7 @@ public class ProductController {
 			@RequestBody SearchProductReqDto criteria, @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
 		String username = SecurityUtil.getUsername();
-		int userId = productService.getUserId(username); // TODO: SEQ로 변경
+		int userId = productService.getUserId(username);
 		String seq = userService.getUser(userId).getSeq();
 
 		log.info("Product Search API: {}, {}", kv("seq", seq), kv("keyword", criteria.getKeyword()));
