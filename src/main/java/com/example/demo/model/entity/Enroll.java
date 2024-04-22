@@ -1,6 +1,5 @@
 package com.example.demo.model.entity;
 import java.math.BigDecimal;
-//import java.util.List;
 import java.util.Date;
 
 import com.example.demo.model.dto.EnrollDto;
@@ -63,7 +62,10 @@ public class Enroll {
 	private String accountNum;
 	
 	@Column(name="DEPOSIT_AMOUNT_CYCLE")
-	private BigDecimal depositAmountCycle;
+	private BigDecimal depositAmtCycle;
+	
+	@Column(name="TARGET_COST")
+	private BigDecimal targetCost;
 	
 	// toDto() : entity -> dto
 	public EnrollDto toDto() {
@@ -77,6 +79,8 @@ public class Enroll {
 		dto.setAccumulatedBalance(this.getAccumulatedBalance());
 		dto.setMaturitySt(this.getMaturitySt());
 		dto.setAccountNum(this.getAccountNum());
+		dto.setDepositAmtCycle(this.getDepositAmtCycle());
+		dto.setTargetCost(this.getTargetCost());
 		return dto;
 	}
 }

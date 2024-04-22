@@ -21,10 +21,8 @@ public class GoalDto {
 	private int id;
 	private int userId;
 	private String goalName;
-	private BigDecimal targetCost;
 	private BigDecimal accumulatedBalance;
 	private Byte goalSt;
-	private int goalPeriod;
 	private Date startDate;
 	private Date endDate;
 	
@@ -32,10 +30,8 @@ public class GoalDto {
 		Goal goal = new Goal();
 		goal.setId(this.getId());
 		goal.setGoalName(this.getGoalName());
-		goal.setTargetCost(this.getTargetCost());
 		goal.setAccumulatedBalance(this.getAccumulatedBalance());
 		goal.setGoalSt(this.getGoalSt());
-		goal.setGoalPeriod(this.getGoalPeriod());
 		goal.setStartDate(this.getStartDate());
 		goal.setEndDate(this.getEndDate());
 		return goal;

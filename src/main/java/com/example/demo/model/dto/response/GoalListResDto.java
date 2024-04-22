@@ -29,17 +29,23 @@ public class GoalListResDto {
 		// 목표 관련 필드 
 		int goalId; // 목표 id
 		String goalName; // 목표명
-		BigDecimal targetCost; // 목표 금액
 		Byte goalSt; // 목표 달성 상태
-		Date startDate; // 시작일
-		int goalPeriod; // 기간(단위:개월)
-		BigDecimal totalBalance; // 목표 누적 금액
+		Date goalStartDate; // 시작일
 		
 		// 등록 관련 필드
 		int enrollId; // 상품 id
 		BigDecimal accumulatedBalance; // 상품 누적 금액
 		String accountNum; // 계좌번호
 		float goalRate; // 달성율(단위: %)
+		BigDecimal targetCost; // 목표금액
+		
+		// 실천방안 관련 필드(자유적금일 경우)
+		String actionPlan; // 실천 방안
+		BigDecimal depositAmt; // 주기 별 입금 금액
+		Date depositStartDate; // 실천 방안 입금 시작일
+		Integer depositAmtCycle; // 주기
+		int totalCount; // 입금 횟수
+		Date lastDepositDate; // 마지막 입금일
 		
 		// 상품 관련 필드 
 		int productId;// 상품 가입 번호

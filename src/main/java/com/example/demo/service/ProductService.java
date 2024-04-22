@@ -238,7 +238,7 @@ public class ProductService {
                     .accountNum(accountNumber)
                     .build();
         if (product.getProductType()==ProductType.SAVINGS) {
-            enroll.setDepositAmountCycle(requestDto.getDepositAmount());
+            enroll.setDepositAmtCycle(requestDto.getDepositAmount());
         } else if (product.getProductType()==ProductType.DEPOSIT) {
             enroll.setAccumulatedBalance(requestDto.getDepositAmount());
         }
