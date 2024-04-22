@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import com.example.demo.model.entity.Goal;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

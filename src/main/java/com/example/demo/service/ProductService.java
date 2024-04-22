@@ -129,6 +129,7 @@ public class ProductService {
 		return user.getId();
 	}
 	
+	// 상품 검색
 	public Page<ProductDocument> searchProducts(SearchProductReqDto dto, Pageable pageable) {
         Criteria criteria = new Criteria();
         if (dto.getProductType().isPresent()) {
@@ -162,9 +163,19 @@ public class ProductService {
         
         return new PageImpl<>(searchHitsContent, pageable, searchHits.getTotalHits());
     }
-
+	
+	// 상품 상세설명 - es
 	public ProductDocument getProductDetail(String productId) throws Exception {
 		Optional<ProductDocument> res = productDocumentRepo.findById(productId);
+		if (!res.isPresent()) {
+			throw new Exception("상품 ID가 존재하지 않습니다.");
+		}
+		return res.get();
+	}
+
+	// 상품 상세설명 - sql
+	public Product getProductDetailSql(int productId) throws Exception {
+		Optional<Product> res = productRepo.findById(productId);
 		if (!res.isPresent()) {
 			throw new Exception("상품 ID가 존재하지 않습니다.");
 		}
@@ -196,10 +207,13 @@ public class ProductService {
 		// dto에 저장하기
 		List<ConnectGoalwithProductResDto.GoalListDto> goalListDto = new ArrayList<>();
 		for (Goal goal : goals) {
+			Enroll enroll = enrollRepo.findByUserIdAndGoalId(userId, goal.getId());
+			BigDecimal targetCost = enroll.getTargetCost();
+			
 			ConnectGoalwithProductResDto.GoalListDto dto = ConnectGoalwithProductResDto.GoalListDto.builder()
 					.goalId(goal.getId())
 					.goalName(goal.getGoalName())
-					.targetCost(goal.getTargetCost())
+					.targetCost(targetCost)
 					.startDate(goal.getStartDate())
 					.build();
 		goalListDto.add(dto);

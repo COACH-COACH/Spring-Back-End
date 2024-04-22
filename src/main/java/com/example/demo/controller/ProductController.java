@@ -22,9 +22,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.model.document.ProductDocument;
 import com.example.demo.model.dto.response.RecommendationResDto;
+import com.example.demo.model.entity.Product;
+import com.example.demo.model.enums.DepositCycle;
+import com.example.demo.model.enums.ProductType;
 import com.example.demo.service.ProductService;
 import com.example.demo.util.SecurityUtil;
 import com.example.demo.model.dto.ProductDocumentDto;
+import com.example.demo.model.dto.ProductDto;
 import com.example.demo.model.dto.request.RecommendationProductReqDto;
 import com.example.demo.model.dto.request.SearchProductReqDto;
 import com.example.demo.model.dto.response.ConnectGoalwithProductResDto;
@@ -63,7 +67,8 @@ public class ProductController {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error getting recommendations", e);
 		}
 	}
-
+	
+	// 상품 상세 설명을 위한 데이터 처리 - string
 	public ProductDocument transformProductData(ProductDocument product) {
         if ("DEPOSIT".equals(product.getProductType())) {
             product.setProductType("예금");
@@ -113,17 +118,30 @@ public class ProductController {
 	    }
 	}
 	
+	// 상품 상세 설명 조회
 	@GetMapping("/detail/{productId}")
-	public ResponseEntity<DefaultResponse<ProductDocument>> searchProductDetail(@PathVariable String productId) {
+	public ResponseEntity<DefaultResponse<?>> searchProductDetail(@PathVariable String productId) {
 		try {
-			ProductDocument result = productService.getProductDetail(productId);
-			return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.READ_PRODUCT_SUCCESS, transformProductData(result)));
+			ProductDto productDto;
+			if (productId.matches("\\d+")) {	// 정규표현식으로 숫자만 있는지 확인
+				int id = Integer.parseInt(productId);
+				Product sqlResult = productService.getProductDetailSql(id);
+				productDto = sqlResult.toDto();
+				return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK,ResponseMessage.READ_PRODUCT_SUCCESS, productDto));
+			} else {
+				ProductDocument esResult = productService.getProductDetail(productId);
+				return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.READ_PRODUCT_SUCCESS, transformProductData(esResult)));
+			}
+		} catch (NumberFormatException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body(DefaultResponse.res(StatusCode.BAD_REQUEST, "Invalid product ID format."));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 	                .body(DefaultResponse.res(StatusCode.BAD_REQUEST, e.getMessage()));
 		}
 	}
 	
+		
 	// 프론트에 목표 리스트 전달
 	@GetMapping("/connect")
 	public ResponseEntity<ConnectGoalwithProductResDto> connectGoalwithProduct(){
