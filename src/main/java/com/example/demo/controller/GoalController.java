@@ -39,11 +39,10 @@ public class GoalController {
 	}
 	
 
-	// Test API
+	// [마이 페이지]
 	@GetMapping("/list")
 	public ResponseEntity<DefaultResponse<List<GoalDto>>> getGoalList() {
 	    String username = SecurityUtil.getUsername();
-//	    int userId = userService.getUserId(username);
 	    
 	    List<GoalDto> goalList = goalService.getGoalListByUsername(username);
 	    DefaultResponse<List<GoalDto>> response = DefaultResponse.res(
@@ -54,7 +53,6 @@ public class GoalController {
 	    return ResponseEntity.ok(response);
 	}
 	
-
 	// [메인 페이지] 회원 목표 조회
 	@GetMapping("/product/list")
 	public ResponseEntity<DefaultResponse<GoalListResDto>> getGoalProductList() {

@@ -54,6 +54,15 @@ public class GoalService {
 		setLifeStageGoal();
 	}
 	
+	public List<GoalDto> getGoalListByUsername(String username) {
+	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
+	        new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
+	    
+		// 해당 사용자의 목표 목록 조회
+	    List<Goal> goals = goalRepo.findByUserId(user.getId());
+		return goals.stream().map(Goal::toDto).collect(Collectors.toList());
+	}
+	
 	public void setLifeStageGoal() {
         lifeStageGoals.put(LifeStage.UNI, List.of("학자금", "여행", "주택", "어학연수", "전자기기", "기타목돈"));
         lifeStageGoals.put(LifeStage.NEW_JOB, List.of("자가마련", "자차마련", "결혼자금", "반려동물", "기타목돈"));
