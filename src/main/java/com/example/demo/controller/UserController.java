@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,9 +70,22 @@ public class UserController {
         userService.updateUser(username, userDto);
         return ResponseEntity.ok(userDto);
     }
+    
+    // 7. 토큰으로 ELK 그래프 그리는데 필요한 SEQ, LFIE_STAGE 정보 받아오기
+    @GetMapping("/data")
+    public ResponseEntity<UserDto> getUserData() {
+    	// 현재 로그인한 유저의 토큰으로, USER_TB의 ID_PK 값 알아내기
+		String username = SecurityUtil.getUsername();
+		int userId = userService.getUserId(username);
+
+        // 사용자 정보를 이용하여 querySEQ와 queryLifeStage 설정
+        UserDto userData = userService.getUser(userId);
+
+        return ResponseEntity.ok(userData);
+    }
 	
 	// 3. 사용자 비활성화
-    @PutMapping("/deactivate")
+    @GetMapping("/deactivate")
 	public void deleteUser() {
     	
     	// 현재 로그인한 유저의 토큰으로, USER_TB의 정보 알아내기
