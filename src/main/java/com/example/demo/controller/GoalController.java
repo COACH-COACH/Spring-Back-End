@@ -38,6 +38,7 @@ public class GoalController {
 		this.userService = userService;
 	}
 	
+
 	// [마이 페이지]
 	@GetMapping("/list")
 	public ResponseEntity<DefaultResponse<List<GoalDto>>> getGoalList() {
