@@ -38,6 +38,7 @@ public class GoalController {
 		this.userService = userService;
 	}
 	
+
 	// Test API
 	@GetMapping("/list")
 	public ResponseEntity<DefaultResponse<List<GoalDto>>> getGoalList() {
@@ -53,6 +54,7 @@ public class GoalController {
 	    return ResponseEntity.ok(response);
 	}
 	
+
 	// [메인 페이지] 회원 목표 조회
 	@GetMapping("/product/list")
 	public ResponseEntity<DefaultResponse<GoalListResDto>> getGoalProductList() {
