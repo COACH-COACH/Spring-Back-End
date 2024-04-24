@@ -21,4 +21,6 @@ public class ResponseMessage {
     
 
     public static final String READ_PRODUCT_SUCCESS = "상품 조회 성공";
+    
+    public static final String READ_NEWS_SUCCESS = "뉴스 조회 성공";
 }
