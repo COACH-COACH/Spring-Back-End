@@ -7,7 +7,9 @@ import com.example.demo.model.document.ProductDocument;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
+@ToString
 @Data
 @Builder
 public class ProductDocumentDto {
@@ -25,6 +27,7 @@ public class ProductDocumentDto {
     private int maturity;
     private String productType;
     private String productDetail;
+    private int idPk;
     
     public ProductDocument toEntity() {
         return ProductDocument.builder()
@@ -42,6 +45,7 @@ public class ProductDocumentDto {
             .maturity(this.getMaturity())
             .productType(this.getProductType())
             .productDetail(this.getProductDetail())
+            .idPk(this.getIdPk())
             .build();
     }
 }

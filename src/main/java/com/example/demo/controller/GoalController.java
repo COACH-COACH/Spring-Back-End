@@ -20,27 +20,30 @@ import com.example.demo.model.dto.request.CreateGoalReqDto;
 import com.example.demo.model.dto.response.GoalListResDto;
 import com.example.demo.model.dto.response.GoalStatisticsResDto;
 import com.example.demo.service.GoalService;
+import com.example.demo.service.UserService;
 import com.example.demo.util.DefaultResponse;
 import com.example.demo.util.ResponseMessage;
 import com.example.demo.util.SecurityUtil;
 import com.example.demo.util.StatusCode;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @RestController
 @RequestMapping("/goal")
 public class GoalController {
 	private final GoalService goalService;
+	private final UserService userService;
 	
 	@Autowired
-	public GoalController(GoalService goalService) {
+	public GoalController(GoalService goalService, UserService userService) {
 		this.goalService = goalService;
+		this.userService = userService;
 	}
 	
-	// Test API
+
+	// [마이 페이지]
 	@GetMapping("/list")
 	public ResponseEntity<DefaultResponse<List<GoalDto>>> getGoalList() {
 	    String username = SecurityUtil.getUsername();
+	    
 	    List<GoalDto> goalList = goalService.getGoalListByUsername(username);
 	    DefaultResponse<List<GoalDto>> response = DefaultResponse.res(
 	        HttpStatus.OK.value(), // 응답 코드

@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import com.example.demo.model.document.ProductDocument;
+import com.example.demo.model.dto.ProductDocumentDto;
 import com.example.demo.model.dto.request.SearchProductReqDto;
 import com.example.demo.repository.es.ProductDocumentRepo;
 import com.example.demo.service.ProductService;
@@ -67,5 +68,16 @@ public class SearchProductTest {
         
         // then
         result.getContent().forEach(System.out::println);
+	}
+	
+	@Test
+	void 상품상세() {
+		try {
+			ProductDocument dto = productService.getProductDetail("ADzj6Y4BBqj7mtS5krt9");
+			System.out.println(dto.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e);
+		}
 	}
 }

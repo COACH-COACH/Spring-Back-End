@@ -88,8 +88,9 @@ public class SecurityConfig {
         // 인가 작업
         // 해당 경로("/login", "/", "/user/join")에 대해 모든 사용자의 접근 허용
         http.authorizeHttpRequests((auth) -> auth
-		              .requestMatchers("/login", "/", "/user/join", "/user/modify").permitAll() // 얘는 왜 /만 되는지 모르겠다.. '/login', 'user/join'안됨
+		              .requestMatchers("/login", "/", "/user/join").permitAll() // 얘는 왜 /만 되는지 모르겠다.. '/login', 'user/join'안됨
 		              .requestMatchers("/user/timeSeriesPrediction/**").permitAll() // 동적 ID를 포함하는 경로 설정
+		              .requestMatchers("/actuator/prometheus").permitAll()
 
 		              .anyRequest().authenticated()); // 나머지 주소는 authenticated 된 것만 접근 가능
         

@@ -8,4 +8,5 @@ public interface UserRepo extends JpaRepository<User, Integer> {
 	
 	//username을 받아 DB 테이블에서 회원을 조회하는 메소드 작성
     User findByLoginId(String LoginId);
+    
 }
