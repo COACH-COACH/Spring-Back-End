@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>coach-coach</artifactId>
+	<artifactId>back-end</artifactId>
 	<version>0.0.1</version>
 	<name>Coach-Coach</name>
 	<description>First project for Spring Boot</description>
@@ -17,7 +17,7 @@
 		<java.version>17</java.version>
 		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
-        <docker-image.prefix>devyuji</docker-image.prefix>
+        <docker-image.prefix>coachcoach</docker-image.prefix>
 	</properties>
 	<dependencies>
 		<dependency>
