@@ -64,11 +64,11 @@ public class GoalService {
 	}
 	
 	public void setLifeStageGoal() {
-        lifeStageGoals.put(LifeStage.UNI, List.of("학자금", "여행", "주택", "어학연수", "전자기기", "기타목돈"));
-        lifeStageGoals.put(LifeStage.NEW_JOB, List.of("자가마련", "자차마련", "결혼자금", "반려동물", "기타목돈"));
-        lifeStageGoals.put(LifeStage.NEW_WED, List.of("자가마련", "자차마련", "자녀준비", "투자비용", "기타목돈"));
-        lifeStageGoals.put(LifeStage.NO_CHILD, List.of("반려동물", "자가마련", "은퇴자금", "투자비용", "기타목돈"));
-        lifeStageGoals.put(LifeStage.HAVE_CHILD, List.of("자가마련", "자녀관련목돈", "은퇴자금", "투자비용", "기타목돈"));
+        lifeStageGoals.put(LifeStage.UNI, List.of("학자금", "여행", "내집마련", "어학연수", "전자기기", "기타목돈"));
+        lifeStageGoals.put(LifeStage.NEW_JOB, List.of("내집마련", "자동차", "결혼", "반려동물", "자기계발", "기타목돈"));
+        lifeStageGoals.put(LifeStage.NEW_WED, List.of("내집마련", "자동차", "자녀", "투자비용", "기타목돈"));
+        lifeStageGoals.put(LifeStage.NO_CHILD, List.of("반려동물", "내집마련", "노후대비", "투자비용", "기타목돈"));
+        lifeStageGoals.put(LifeStage.HAVE_CHILD, List.of("내집마련", "자녀", "노후대비", "투자비용", "기타목돈"));
         lifeStageGoals.put(LifeStage.RETIR, List.of("건강", "창업비용", "취미", "자기계발", "기타목돈"));
     }
 	
