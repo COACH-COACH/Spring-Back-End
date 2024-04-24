@@ -44,17 +44,3 @@ public class RecommendationResDto {
 		}
 	}
 }
-
-
-//	private List<ItemRecommendation> recommendations;
-//	
-
-//	public static class ItemRecommendation{
-//		private int id;
-//		private String productName;
-//		private int maxInterestRate;
-//		private int maturity;
-//	}
-//	
-//	
-//}
