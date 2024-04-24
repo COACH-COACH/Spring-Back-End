@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,10 +22,15 @@ import org.springframework.web.client.RestTemplate;
 import com.example.demo.model.dto.PaymentDto;
 import com.example.demo.model.dto.UserDto;
 import com.example.demo.service.UserService;
+import com.example.demo.util.DefaultResponse;
+import com.example.demo.util.ResponseMessage;
 import com.example.demo.util.SecurityUtil;
+import com.example.demo.util.StatusCode;
 
-//import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
+import static net.logstash.logback.argument.StructuredArguments.kv;
 
+@Slf4j
 @RestController
 @ResponseBody
 @RequestMapping("/user")
@@ -51,13 +55,19 @@ public class UserController {
 	
 	// 2. 데이터 삽입 - 회원 가입
 	@PostMapping("/join")
-	public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {
+	public ResponseEntity<DefaultResponse<UserDto>> addUser(@RequestBody UserDto userDto) {
 		// @RequestBody는 json으로 들어오는 바디 데이터를 파싱하는 역할이라서
 		// postman의 form-data로 보냈을 경우 에러남 - json으로 보내기
-		
-		userService.addUser(userDto);
-		
-		return ResponseEntity.ok(userDto);
+		try {
+			UserDto resDto = userService.addUser(userDto);
+			
+			log.info("SignUp API: {}, {}, {}", kv("seq", userDto.getSeq()), kv("fullname", userDto.getFullName()), kv("lifestage", userDto.getLifeStage()));
+			
+			return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CREATED_USER, resDto));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(DefaultResponse.res(StatusCode.BAD_REQUEST, e.getMessage()));
+		}
 	}
 	
 	// 6. 사용자 정보 수정

@@ -86,6 +86,7 @@ public class User {
 		dto.setFullName(this.getFullName());
 		dto.setSex(this.getSex());
 		dto.setBirthDate(this.getBirthDate());
+		dto.setRegistDate(this.getRegistDate());
 		dto.setRegion(this.getRegion());
 		dto.setLifeStage(this.getLifeStage());
 		dto.setActiveStatus(this.getActiveStatus());
