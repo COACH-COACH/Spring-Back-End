@@ -63,6 +63,9 @@ public class ProductDocument {
     @Field(name = "PRODUCT_DETAIL", type = FieldType.Keyword)
     private String productDetail;
     
+    @Field(name = "ID_PK", type = FieldType.Integer)
+    private int idPk;
+    
     public ProductDocumentDto toDto() {
         return ProductDocumentDto.builder()
             .id(this.getId())
@@ -79,6 +82,7 @@ public class ProductDocument {
             .maturity(this.getMaturity())
             .productType(this.getProductType())
             .productDetail(this.getProductDetail())
+            .idPk(this.getIdPk())
             .build();
     }
 
