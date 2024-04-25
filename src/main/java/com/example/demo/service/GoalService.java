@@ -117,6 +117,7 @@ public class GoalService {
             .goalName(goal.getGoalName())
             .goalSt(goal.getGoalSt())
             .goalStartDate(goal.getStartDate())
+            .goalPeriod(goal.getGoalPeriod())
             .build();
     }
 	
@@ -126,6 +127,7 @@ public class GoalService {
                 .goalName(goal.getGoalName())
                 .goalSt(goal.getGoalSt())
                 .goalStartDate(goal.getStartDate())
+                .goalPeriod(goal.getGoalPeriod())
                 .enrollId(enroll.getId())
                 .accumulatedBalance(enroll.getAccumulatedBalance())
                 .goalRate(accurateGoalRate(enroll.getStartDate(), enroll.getEndDate()))
@@ -148,6 +150,7 @@ public class GoalService {
             .goalName(goal.getGoalName())
             .goalSt(goal.getGoalSt())
             .goalStartDate(goal.getStartDate())
+            .goalPeriod(goal.getGoalPeriod())
             .enrollId(enroll.getId())
             .targetCost(enroll.getTargetCost())
             .accumulatedBalance(enroll.getAccumulatedBalance())
