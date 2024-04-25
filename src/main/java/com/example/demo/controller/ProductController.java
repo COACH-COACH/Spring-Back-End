@@ -147,14 +147,22 @@ public class ProductController {
 		}
 	}
 		
-	// 프론트에 목표 리스트 전달
+	// 프론트에 목표 리스트 전달	*********값이 안나옴*********
 	@GetMapping("/connect")
-	public ResponseEntity<ConnectGoalwithProductResDto> connectGoalwithProduct(){
-		String username = SecurityUtil.getUsername();
-		int userId = productService.getUserId(username);
-		ConnectGoalwithProductResDto responseDto = productService.connectGoalwithProduct(userId);
-		return ResponseEntity.ok(responseDto);
-	}
+	public ResponseEntity<Object> connectGoalwithProduct() {
+	    String username = SecurityUtil.getUsername();
+	    if (username == null || username.isEmpty()) {
+	        return ResponseEntity.badRequest().body("사용자 이름을 찾을 수 없습니다.");
+	    }
+	
+	    int userId = productService.getUserId(username);
+	    if (userId == 0) {
+	        return ResponseEntity.badRequest().body("유효하지 않은 사용자 ID입니다.");
+	    }
+	
+	    return productService.connectGoalwithProduct(userId);
+    }
+
 	
 	// 상품 가입
 	@PostMapping("/register/{productId}/{goalId}")
