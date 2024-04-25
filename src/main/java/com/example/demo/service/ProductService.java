@@ -201,30 +201,39 @@ public class ProductService {
 	
 	// 상품 가입 - 상품과 목표 연동을 위한 목표 list
 	@Transactional
-	public ConnectGoalwithProductResDto connectGoalwithProduct(int userId) {
-		// status 0인 목표만 가져오기
-		List<Goal> goals = goalRepo.findByUserIdAndGoalSt(userId, (byte) 0);
-		// dto에 저장하기
-		List<ConnectGoalwithProductResDto.GoalListDto> goalListDto = new ArrayList<>();
-		for (Goal goal : goals) {
-			Enroll enroll = enrollRepo.findByUserIdAndGoalId(userId, goal.getId());
-			BigDecimal targetCost = enroll.getTargetCost();
-			
-			ConnectGoalwithProductResDto.GoalListDto dto = ConnectGoalwithProductResDto.GoalListDto.builder()
-					.goalId(goal.getId())
-					.goalName(goal.getGoalName())
-					.targetCost(targetCost)
-					.startDate(goal.getStartDate())
-					.build();
-		goalListDto.add(dto);
-		}
-		
-		ConnectGoalwithProductResDto responseDto = ConnectGoalwithProductResDto.builder()
-				.goals(goalListDto)
-				.build();
+	public ResponseEntity<Object> connectGoalwithProduct(int userId) {
+	    List<Goal> goals = goalRepo.findByUserIdAndGoalSt(userId, (byte) 0);
+	    if (goals == null || goals.isEmpty()) {
+	        return ResponseEntity.ok("목표가 없습니다. 목표를 생성해 보세요!");
+	    }
 
-		return responseDto;
+	    List<ConnectGoalwithProductResDto.GoalListDto> goalListDto = new ArrayList<>();
+	    boolean allEnrolled = true;
+	    // ENROLL_TB에 없는 goal만 response dto에 저장
+	    for (Goal goal : goals) {
+	    	Optional<Enroll> enrollOptional = enrollRepo.findOptionalByUserIdAndGoalId(userId, goal.getId());
+	        if (enrollOptional.isEmpty()) {
+	            ConnectGoalwithProductResDto.GoalListDto dto = ConnectGoalwithProductResDto.GoalListDto.builder()
+	                    .goalId(goal.getId())
+	                    .goalName(goal.getGoalName())
+	                    .startDate(goal.getStartDate())
+	                    .build();
+	            goalListDto.add(dto);
+	            allEnrolled = false;
+	        }
+	    }
+
+	    if (allEnrolled) {
+	        return ResponseEntity.ok("이미 모든 목표에 상품이 가입되어 있습니다.");
+	    }
+
+	    ConnectGoalwithProductResDto responseDto = ConnectGoalwithProductResDto.builder()
+	            .goals(goalListDto)
+	            .build();
+
+	    return ResponseEntity.ok(responseDto);
 	}
+
 	
 	// 상품 가입 - DB에 저장
 	@Transactional
@@ -236,11 +245,18 @@ public class ProductService {
         Goal goal = goalRepo.findById(goalId)
         		.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 목표입니다."));
             
-            Date startDate = new Date();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(startDate);
-            calendar.add(Calendar.MONTH, product.getMaturity());
-            String accountNumber = AccountNumberGenerator.generateAccountNumber();
+            Date startDate = new Date();											
+            Calendar calendar = Calendar.getInstance();								
+            calendar.setTime(startDate);											// 상품 가입 날짜로 START_DATE 설정
+            calendar.add(Calendar.MONTH, product.getMaturity());					// START_DATE에서 상품 기간 만큼 더해서 END_DATE 설정
+            System.out.println("StartDate: " + startDate);
+            System.out.println("EndDate after adding maturity: " + calendar.getTime());
+
+            String accountNumber = AccountNumberGenerator.generateAccountNumber();	// 계좌번호 생성
+            
+            BigDecimal depositAmount = requestDto.getDepositAmount();
+            BigDecimal maturity = new BigDecimal(product.getMaturity());
+            BigDecimal targetCostSavings = maturity.multiply(depositAmount); 		// 적금 상품 목표 금액 생성 
             
             Enroll enroll = Enroll.builder()
                     .user(user)
@@ -252,9 +268,12 @@ public class ProductService {
                     .accountNum(accountNumber)
                     .build();
         if (product.getProductType()==ProductType.SAVINGS) {
-            enroll.setDepositAmtCycle(requestDto.getDepositAmount());
+            enroll.setDepositAmtCycle(requestDto.getDepositAmount());		// 매달 입금할 금액 -> 목표 금액 계산에 이용
+            enroll.setAccumulatedBalance(requestDto.getFirstDeposit());		// 초기 입금액을 계좌 잔액에 예치
+            enroll.setTargetCost(targetCostSavings);						// 목표 금액 계산 후 DB에 저장
         } else if (product.getProductType()==ProductType.DEPOSIT) {
             enroll.setAccumulatedBalance(requestDto.getDepositAmount());
+            enroll.setTargetCost(requestDto.getDepositAmount());			// 예치금을 목표 금액으로
         }
         enrollRepo.save(enroll);
         log.info("Enroll saved: {}", enroll);
