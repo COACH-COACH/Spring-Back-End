@@ -23,6 +23,7 @@ public class GoalDto {
 	private String goalName;
 	private BigDecimal accumulatedBalance;
 	private Byte goalSt;
+	private int goalPeriod;
 	private Date startDate;
 	private Date endDate;
 	
@@ -32,6 +33,7 @@ public class GoalDto {
 		goal.setGoalName(this.getGoalName());
 		goal.setAccumulatedBalance(this.getAccumulatedBalance());
 		goal.setGoalSt(this.getGoalSt());
+		goal.setGoalPeriod(this.getGoalPeriod());
 		goal.setStartDate(this.getStartDate());
 		goal.setEndDate(this.getEndDate());
 		return goal;

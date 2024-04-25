@@ -49,6 +49,9 @@ public class Goal {
 	@Column(name="GOAL_ST")
 	private Byte goalSt;
 	
+	@Column(name="GOAL_PERIOD")
+	private int goalPeriod;
+	
 	@Column(name="START_DATE")
 	private Date startDate;
 	
@@ -67,6 +70,7 @@ public class Goal {
 		dto.setGoalName(this.getGoalName());
 		dto.setAccumulatedBalance(this.getAccumulatedBalance());
 		dto.setGoalSt(this.getGoalSt());
+		dto.setGoalPeriod(this.getGoalPeriod());
 		dto.setStartDate(this.getStartDate());
 		dto.setEndDate(this.getEndDate());
 		return dto;

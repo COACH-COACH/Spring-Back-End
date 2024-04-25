@@ -31,6 +31,7 @@ public class GoalListResDto {
 		String goalName; // 목표명
 		Byte goalSt; // 목표 달성 상태
 		Date goalStartDate; // 시작일
+		int goalPeriod;
 		
 		// 등록 관련 필드
 		int enrollId; // 상품 id
