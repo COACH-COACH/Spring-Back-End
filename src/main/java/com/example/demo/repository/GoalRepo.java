@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.demo.model.entity.Goal;
 
@@ -18,5 +19,7 @@ public interface GoalRepo extends JpaRepository<Goal, Integer> {
 			+ ", AVG(TARGET_COST) AS avg_target_cost FROM GOAL_TB GROUP BY GOAL_NAME",
 			nativeQuery = true)
     List<Object[]> findGoalStatistics(); // 네이티브 쿼리는 Object[]로 받음 
-
+    
+//    @Query("SELECT g FROM Goal g WHERE g.user = :userId AND g.goalSt = 0 AND NOT EXISTS (SELECT 1 FROM Enroll e WHERE e.goal = g.id AND e.user = :userId)")
+//    List<Goal> findUnenrolledGoalsByUserId(@Param("userId") int userId);
 }

@@ -3,6 +3,7 @@ version: "3.8"
 services:
   app:
     build: .
+    image: coachcoach/spring-back-end-app:1.0
     ports:
       - "8080:8080"
     environment:
@@ -14,6 +15,7 @@ services:
 
   filebeat:
     build: filebeat
+    image: coachcoach/spring-back-end-filebeat:1.0
     container_name: filebeat
     restart: unless-stopped
     volumes:
