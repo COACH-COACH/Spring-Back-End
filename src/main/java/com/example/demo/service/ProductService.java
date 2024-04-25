@@ -203,16 +203,20 @@ public class ProductService {
 	@Transactional
 	public ResponseEntity<Object> connectGoalwithProduct(int userId) {
 	    List<Goal> goals = goalRepo.findByUserIdAndGoalSt(userId, (byte) 0);
-	    if (goals == null || goals.isEmpty()) {
-	        return ResponseEntity.ok("목표가 없습니다. 목표를 생성해 보세요!");
+	    Map<String, Object> response = new HashMap<>();
+	    
+	    if (goals.isEmpty()) {
+	        response.put("goals", Collections.emptyList());
+	        response.put("message", "목표가 없습니다. 목표를 생성해 보세요!");
+	        return ResponseEntity.ok(response);
 	    }
 
 	    List<ConnectGoalwithProductResDto.GoalListDto> goalListDto = new ArrayList<>();
 	    boolean allEnrolled = true;
-	    // ENROLL_TB에 없는 goal만 response dto에 저장
+	    
 	    for (Goal goal : goals) {
-	    	Optional<Enroll> enrollOptional = enrollRepo.findOptionalByUserIdAndGoalId(userId, goal.getId());
-	        if (enrollOptional.isEmpty()) {
+	        Optional<Enroll> enrollOptional = enrollRepo.findOptionalByUserIdAndGoalId(userId, goal.getId());
+	        if (!enrollOptional.isPresent()) {
 	            ConnectGoalwithProductResDto.GoalListDto dto = ConnectGoalwithProductResDto.GoalListDto.builder()
 	                    .goalId(goal.getId())
 	                    .goalName(goal.getGoalName())
@@ -224,15 +228,16 @@ public class ProductService {
 	    }
 
 	    if (allEnrolled) {
-	        return ResponseEntity.ok("이미 모든 목표에 상품이 가입되어 있습니다.");
+	        response.put("goals", Collections.emptyList());
+	        response.put("message", "이미 모든 목표에 상품이 가입되어 있습니다.");
+	        return ResponseEntity.ok(response);
 	    }
 
-	    ConnectGoalwithProductResDto responseDto = ConnectGoalwithProductResDto.builder()
-	            .goals(goalListDto)
-	            .build();
-
-	    return ResponseEntity.ok(responseDto);
+	    response.put("goals", goalListDto);
+	    response.put("message", ""); // 목표가 있을 때는 빈 메시지
+	    return ResponseEntity.ok(response);
 	}
+
 
 	
 	// 상품 가입 - DB에 저장
