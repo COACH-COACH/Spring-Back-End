@@ -91,7 +91,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         
         // loginId를 기반으로 JWT 토큰 생성(토큰의 유효기간 포함)
         String token = jwtUtil.createJwt(loginId, 1000 * 60L * 10 * 100); // 1000분
-        System.out.println(token);
         
         // HTTP 응답 헤더에 Authorization 필드로 추가하여 클라이언트에게 전달
         response.addHeader("Authorization", "Bearer " + token);
