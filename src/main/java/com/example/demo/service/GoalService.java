@@ -26,6 +26,7 @@ import com.example.demo.model.entity.Product;
 import com.example.demo.model.entity.User;
 import com.example.demo.model.enums.DepositCycle;
 import com.example.demo.model.enums.LifeStage;
+import com.example.demo.model.enums.ProductType;
 import com.example.demo.repository.EnrollRepo;
 import com.example.demo.repository.GoalRepo;
 import com.example.demo.repository.PlanRepo;
@@ -111,30 +112,33 @@ public class GoalService {
         return goalProductList;
     }
 	
+	// 목표에 추가된 상품 X
 	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithoutEnroll(Goal goal) {
         return GoalListResDto.GoalAndProductDto.builder()
             .goalId(goal.getId())
             .goalName(goal.getGoalName())
             .goalSt(goal.getGoalSt())
             .goalStartDate(goal.getStartDate())
-            .goalPeriod(goal.getGoalPeriod())
             .build();
     }
 	
+	// 목표에 추가된 상품 O(자유적금 O)
 	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithPlan(Goal goal, Enroll enroll, Product product, Plan plan) {
         return GoalListResDto.GoalAndProductDto.builder()
                 .goalId(goal.getId())
                 .goalName(goal.getGoalName())
                 .goalSt(goal.getGoalSt())
                 .goalStartDate(goal.getStartDate())
-                .goalPeriod(goal.getGoalPeriod())
                 .enrollId(enroll.getId())
+                .productStartDate(enroll.getStartDate())
                 .accumulatedBalance(enroll.getAccumulatedBalance())
                 .goalRate(accurateGoalRate(enroll.getStartDate(), enroll.getEndDate()))
                 .accountNum(enroll.getAccountNum())
                 .targetCost(enroll.getTargetCost())
                 .productId(product.getId())
                 .productName(product.getProductName())
+                .depositCycle(setDepositCycle(product.getDepositCycle()))
+                
                 .actionPlan(plan.getActionPlan())
                 .depositAmt(plan.getDepositAmt())
                 .depositStartDate(plan.getDepositStartDate())
@@ -144,21 +148,29 @@ public class GoalService {
                 .build();
     }
 
+	// 목표에 추가된 상품 O(자유적금X)
     private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithProduct(Goal goal, Enroll enroll, Product product) {
         return GoalListResDto.GoalAndProductDto.builder()
             .goalId(goal.getId())
             .goalName(goal.getGoalName())
             .goalSt(goal.getGoalSt())
             .goalStartDate(goal.getStartDate())
-            .goalPeriod(goal.getGoalPeriod())
             .enrollId(enroll.getId())
+            .productStartDate(enroll.getStartDate())
             .targetCost(enroll.getTargetCost())
             .accumulatedBalance(enroll.getAccumulatedBalance())
             .goalRate(accurateGoalRate(enroll.getStartDate(), enroll.getEndDate()))
             .accountNum(enroll.getAccountNum())
             .productId(product.getId())
             .productName(product.getProductName())
+            .depositCycle(setDepositCycle(product.getDepositCycle()))
             .build();
+    }
+    
+    private String setDepositCycle(DepositCycle depositCycle) {
+    	if (depositCycle.equals(DepositCycle.FIXED)) return "예금";
+    	else if (depositCycle.equals(DepositCycle.FLEXIBLE)) return "자유적금";
+    	else return "정기적금";
     }
 	
     private float accurateGoalRate(Date startDate, Date endDate) {
@@ -239,7 +251,6 @@ public class GoalService {
 				.user(user)
 				.goalName(reqDto.getGoalName())
 				.startDate(new Date())
-				.accumulatedBalance(BigDecimal.ZERO)
 				.goalSt((byte) 0)
 				.build();
 		Goal result = goalRepo.save(newGoal);
