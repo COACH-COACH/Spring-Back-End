@@ -1,15 +1,22 @@
 package com.example.demo.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -30,9 +37,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.model.document.ProductDocument;
+import com.example.demo.model.document.SearchKeywordDocument;
 import com.example.demo.model.dto.EnrollDto;
 import com.example.demo.model.dto.ProductDocumentDto;
 import com.example.demo.repository.es.ProductDocumentRepo;
+import com.example.demo.repository.es.SearchKeywordDocumentRepo;
 
 import jakarta.transaction.Transactional;
 
@@ -55,18 +64,21 @@ import com.example.demo.model.dto.response.RecommendationResDto.ItemRecommendati
 public class ProductService {
 	private final ElasticsearchOperations elasticsearchOperations;
 	private final ProductDocumentRepo productDocumentRepo;
+	private final SearchKeywordDocumentRepo searchKeywordDocumentRepo;
 	private final UserRepo userRepo;
-	private final RestTemplate restTemplate;
-	private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 	private final ProductRepo productRepo;
 	private final GoalRepo goalRepo;
 	private final EnrollRepo enrollRepo;
+	private final RestTemplate restTemplate;
+	private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 	
 	@Autowired
-	public ProductService(ElasticsearchOperations elasticsearchOperations, ProductDocumentRepo productDocumentRepo, UserRepo userRepo, 
-			ProductRepo productRepo,GoalRepo goalRepo, EnrollRepo enrollRepo, RestTemplate restTemplate) {
+	public ProductService(ElasticsearchOperations elasticsearchOperations,
+			ProductDocumentRepo productDocumentRepo, SearchKeywordDocumentRepo searchKeywordDocumentRepo,
+			UserRepo userRepo, ProductRepo productRepo,GoalRepo goalRepo, EnrollRepo enrollRepo, RestTemplate restTemplate) {
 		this.elasticsearchOperations = elasticsearchOperations;
 		this.productDocumentRepo = productDocumentRepo;
+		this.searchKeywordDocumentRepo = searchKeywordDocumentRepo;
 		this.userRepo = userRepo;
 		this.productRepo = productRepo;
 		this.goalRepo = goalRepo;
@@ -164,6 +176,37 @@ public class ProductService {
         return new PageImpl<>(searchHitsContent, pageable, searchHits.getTotalHits());
     }
 	
+	// 검색 키워드 가져오기
+    public Map<String, List<Integer>> getKeywords(String seq) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+        
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"));
+        String endDate = now.format(formatter); // "now"
+        String startDate = now.minusDays(3).format(formatter); // "now-3d" 
+   
+    	Criteria criteria = new Criteria("seq").is(seq);
+        List<SearchKeywordDocument> results = searchKeywordDocumentRepo.findBySeqAndTimestampBetween(seq, startDate, endDate);    	
+        Map<String, List<Integer>> keywordToProductIds = new HashMap<>();
+
+        if (!results.isEmpty()) {
+            results.forEach(document -> {
+                String keyword = document.getKeyword();
+                Set<Integer> productIds = new HashSet<>();
+                
+                List<ProductDocument> products = new ArrayList<>();
+                products.addAll(productDocumentRepo.findByProductNameContaining(keyword));
+                products.addAll(productDocumentRepo.findByProductDetailContaining(keyword));
+                products.addAll(productDocumentRepo.findByPreferConditionContaining(keyword));
+                
+                products.forEach(product -> productIds.add(product.getIdPk()));
+                
+//                List<Integer> productIds = products.stream().map(ProductDocument::getIdPk).collect(Collectors.toList());
+                keywordToProductIds.put(keyword, new ArrayList<>(productIds));
+            });
+        }
+        return keywordToProductIds;
+    }
+	
 	// 상품 상세설명 - es
 	public ProductDocument getProductDetail(String productId) throws Exception {
 		Optional<ProductDocument> res = productDocumentRepo.findById(productId);
@@ -181,6 +224,7 @@ public class ProductService {
 		}
 		return res.get();
 	}
+	
 	
 	// 계좌번호 생성 메서드
 	public class AccountNumberGenerator {
