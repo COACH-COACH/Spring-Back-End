@@ -178,6 +178,10 @@ public class ProductService {
 	
 	// 검색 키워드 가져오기
     public Map<String, List<Integer>> getKeywords(String seq) {
+        if (seq == null || seq.isEmpty()) {
+            throw new IllegalArgumentException("SEQ가 없습니다.");
+        }
+        
         DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
         
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"));
@@ -185,7 +189,8 @@ public class ProductService {
         String startDate = now.minusDays(3).format(formatter); // "now-3d" 
    
     	Criteria criteria = new Criteria("seq").is(seq);
-        List<SearchKeywordDocument> results = searchKeywordDocumentRepo.findBySeqAndTimestampBetween(seq, startDate, endDate);    	
+        
+    	List<SearchKeywordDocument> results = searchKeywordDocumentRepo.findBySeqAndTimestampBetween(seq, startDate, endDate);    	
         Map<String, List<Integer>> keywordToProductIds = new HashMap<>();
 
         if (!results.isEmpty()) {

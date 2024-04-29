@@ -127,12 +127,20 @@ public class ProductController {
 	
 	// 검색 키워드 로그 가져오기
     @GetMapping("/getkeyword")
-    public Map<String, List<Integer>> ProductSearchKeywords() {
-      String username = SecurityUtil.getUsername();
-      int userId = productService.getUserId(username);
-      String seq = userService.getUser(userId).getSeq();
-      
-      return productService.getKeywords(seq);
+    public ResponseEntity<?> ProductSearchKeywords() {
+        try {
+            String username = SecurityUtil.getUsername();
+            int userId = userService.getUserId(username);
+            String seq = userService.getUser(userId).getSeq();
+            
+            // 추후에는 신입 고객들도 다 seq 있을 것
+            if (seq == null || seq.isEmpty()) {
+                throw new IllegalArgumentException("SEQ가 없습니다.");
+            }
+            return ResponseEntity.ok(productService.getKeywords(seq));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 	
 	
