@@ -21,7 +21,7 @@ node {
         stage('Deploy') {
             sshagent(credentials: ['ec2-springboot-server-ssh']) {
                 sh 'ssh -o StrictHostKeyChecking=no ubuntu@3.39.168.72 "sudo docker-compose -f /home/ubuntu/docker-compose.yml pull"'
-                sh 'ssh -o StrictHostKeyChecking=no ubuntu@3.39.168.72 "sudo docker-compose -f /home/ubuntu/docker-compose.yml up -d"'
+                sh 'ssh -o StrictHostKeyChecking=no ubuntu@3.39.168.72 "sudo docker-compose --env-file=/home/ubuntu/.env -f /home/ubuntu/docker-compose.yml up -d"'
             }
         }
         

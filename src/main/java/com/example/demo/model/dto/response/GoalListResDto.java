@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.example.demo.model.enums.ProductType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,11 +32,11 @@ public class GoalListResDto {
 		int goalId; // 목표 id
 		String goalName; // 목표명
 		Byte goalSt; // 목표 달성 상태
-		Date goalStartDate; // 시작일
-		int goalPeriod;
+		Date goalStartDate; // 목표 시작일
 		
 		// 등록 관련 필드
 		int enrollId; // 상품 id
+		Date productStartDate; // 상품 가입일
 		BigDecimal accumulatedBalance; // 상품 누적 금액
 		String accountNum; // 계좌번호
 		float goalRate; // 달성율(단위: %)
@@ -51,6 +53,6 @@ public class GoalListResDto {
 		// 상품 관련 필드 
 		int productId;// 상품 가입 번호
 		String productName; // 상품명(PRODUCT_TB)
-		
+		String depositCycle; //상품 종류
 	}
 }
