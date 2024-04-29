@@ -124,6 +124,26 @@ public class ProductController {
 		}
 	}
 	
+	
+	// 검색 키워드 로그 가져오기
+    @GetMapping("/getkeyword")
+    public ResponseEntity<?> ProductSearchKeywords() {
+        try {
+            String username = SecurityUtil.getUsername();
+            int userId = userService.getUserId(username);
+            String seq = userService.getUser(userId).getSeq();
+            
+            // 추후에는 신입 고객들도 다 seq 있을 것
+            if (seq == null || seq.isEmpty()) {
+                throw new IllegalArgumentException("SEQ가 없습니다.");
+            }
+            return ResponseEntity.ok(productService.getKeywords(seq));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+	
+	
 	// 상품 상세 설명 조회
 	@GetMapping("/detail/{productId}")
 	public ResponseEntity<DefaultResponse<?>> searchProductDetail(@PathVariable String productId) {
@@ -147,7 +167,7 @@ public class ProductController {
 		}
 	}
 		
-	// 프론트에 목표 리스트 전달	*********값이 안나옴*********
+	// 프론트에 목표 리스트 전달
 	@GetMapping("/connect")
 	public ResponseEntity<Object> connectGoalwithProduct() {
 	    String username = SecurityUtil.getUsername();
