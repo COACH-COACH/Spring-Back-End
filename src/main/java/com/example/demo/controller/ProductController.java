@@ -124,6 +124,18 @@ public class ProductController {
 		}
 	}
 	
+	
+	// 검색 키워드 로그 가져오기
+    @GetMapping("/getkeyword")
+    public Map<String, List<Integer>> ProductSearchKeywords() {
+      String username = SecurityUtil.getUsername();
+      int userId = productService.getUserId(username);
+      String seq = userService.getUser(userId).getSeq();
+      
+      return productService.getKeywords(seq);
+    }
+	
+	
 	// 상품 상세 설명 조회
 	@GetMapping("/detail/{productId}")
 	public ResponseEntity<DefaultResponse<?>> searchProductDetail(@PathVariable String productId) {
@@ -147,7 +159,7 @@ public class ProductController {
 		}
 	}
 		
-	// 프론트에 목표 리스트 전달	*********값이 안나옴*********
+	// 프론트에 목표 리스트 전달
 	@GetMapping("/connect")
 	public ResponseEntity<Object> connectGoalwithProduct() {
 	    String username = SecurityUtil.getUsername();
