@@ -17,8 +17,9 @@ import org.springframework.stereotype.Service;
 import com.example.demo.exception.GoalLimitExceededException;
 import com.example.demo.model.dto.GoalDto;
 import com.example.demo.model.dto.request.CreateGoalReqDto;
+import com.example.demo.model.dto.response.GoalCategoryResDto;
+import com.example.demo.model.dto.response.GoalCategoryResDto.GoalStatistics;
 import com.example.demo.model.dto.response.GoalListResDto;
-import com.example.demo.model.dto.response.GoalStatisticsResDto;
 import com.example.demo.model.entity.Enroll;
 import com.example.demo.model.entity.Goal;
 import com.example.demo.model.entity.Plan;
@@ -26,7 +27,6 @@ import com.example.demo.model.entity.Product;
 import com.example.demo.model.entity.User;
 import com.example.demo.model.enums.DepositCycle;
 import com.example.demo.model.enums.LifeStage;
-import com.example.demo.model.enums.ProductType;
 import com.example.demo.repository.EnrollRepo;
 import com.example.demo.repository.GoalRepo;
 import com.example.demo.repository.PlanRepo;
@@ -201,16 +201,16 @@ public class GoalService {
         return rate > 100.0f ? 100.0f : rate;
     }
 
-	public List<GoalStatisticsResDto> getGoalStatList(String username) {
+	public GoalCategoryResDto getGoalStatList(String username) {
 		// 1. user의 라이프스테이지에 맞는 목표 가져오기
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
-	    List<GoalStatisticsResDto> statisticsList = new ArrayList<>();
+	    List<GoalStatistics> statisticsList = new ArrayList<>();
 	    
 	    // 2. statisticsList 초기화
         lifeStageGoals.getOrDefault(user.getLifeStage(), List.of()).forEach(goalName -> {
-            statisticsList.add(GoalStatisticsResDto.builder()
+            statisticsList.add(GoalStatistics.builder()
                     .goalName(goalName)
                     .goalRate(0.0f)
                     .goalAvgTargetAmt(BigDecimal.ZERO)
@@ -232,8 +232,14 @@ public class GoalService {
                         stat.setGoalAvgTargetAmt(goalAvgTargetAmt);
                     });
         }
+        
+        // 4. user 정보와 결합
+        GoalCategoryResDto resDto = GoalCategoryResDto.builder()
+        		.fullName(user.getFullName())
+        		.categoryList(statisticsList)
+        		.build();
 
-        return statisticsList;
+        return resDto;
 	}
 	
 	public GoalDto addGoal(CreateGoalReqDto reqDto, String username) {
