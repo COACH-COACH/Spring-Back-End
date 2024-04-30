@@ -2,6 +2,7 @@ package com.example.demo.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.util.Date;
 import com.example.demo.model.dto.PlanDto;
 
 @Entity
+@Builder
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
