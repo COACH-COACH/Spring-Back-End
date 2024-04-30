@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.demo.config.FlaskConfig;
 import com.example.demo.model.dto.PaymentDto;
 import com.example.demo.model.dto.UserDto;
 import com.example.demo.service.UserService;
@@ -37,6 +38,9 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 public class UserController {
 	
 	private final UserService userService;
+	
+	@Autowired
+	private FlaskConfig flaskConfig;
 	
 	@Autowired
     private RestTemplate restTemplate;
@@ -113,7 +117,7 @@ public class UserController {
 	// 5. flask와 통신 후 예측 완료된 값 return
 	@GetMapping("/invoke-flask")
     public String invokeFlaskServer() {
-		String url = "http://localhost:5000/timeSeries"; // Flask 서버의 엔드포인트 URL
+		String url = flaskConfig.flaskUrl + "/timeSeries"; // Flask 서버의 엔드포인트 URL
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
