@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -93,14 +94,12 @@ public class GoalService {
 	private List<GoalListResDto.GoalAndProductDto> convertGoalsToDto(List<Goal> goals, User user) {
         List<GoalListResDto.GoalAndProductDto> goalProductList = new ArrayList<>();
         goals.forEach(goal -> {
-            Enroll enroll = Optional.of(enrollRepo.findByUserIdAndGoalId(user.getId(), goal.getId()))
-                .orElse(null);
-
-            if (enroll == null) {														// 1. 목표에 등록된 상품 X
-                goalProductList.add(buildGoalProductDtoWithoutEnroll(goal));
+            Optional<Enroll> res = enrollRepo.findByUserIdAndGoalId(user.getId(), goal.getId());
+            if(res.isEmpty()) {
+            	goalProductList.add(buildGoalProductDtoWithoutEnroll(goal));
                 return;
             }
-
+            Enroll enroll = res.get();
             Product product = enroll.getProduct();										// 2. 목표에 등록된 상품 O
             if (product.getDepositCycle().equals(DepositCycle.FLEXIBLE)) { 				// 2-1. 자유적금
                 Plan plan = planRepo.findByEnroll_id(enroll.getId()).orElse(null);
