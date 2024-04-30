@@ -98,7 +98,7 @@ public class GoalController {
 	    }
 	}
 	
-	// [메인 페이지?] 목표 제거
+	// [메인 페이지] 목표 제거
 	@DeleteMapping("/{goalId}")
 	public ResponseEntity removeGoal(@PathVariable int goalId) {
 		try {
