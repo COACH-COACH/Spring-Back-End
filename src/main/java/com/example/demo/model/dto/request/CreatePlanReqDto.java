@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreatePlanReqDto {
-	public int enrollId; // 가입ID
+//	public int enrollId; // 가입ID
 	public String actionPlan; // 실천방안 내용
 //	public Date startDate; // 실천방안 생성일
 	public BigDecimal depositAmt; // 입금액
