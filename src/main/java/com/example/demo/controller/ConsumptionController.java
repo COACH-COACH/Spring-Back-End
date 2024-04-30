@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -31,19 +32,22 @@ public class ConsumptionController {
 	// 프론트에서 SEQ와 BAS_YH 컨트롤러를 띄워주는 API
 	
 	
-	// elasticSearch 집계 받아옴
+	// 이전 기간동안의 최대 지출 카테고리
     @GetMapping("/max")
     public ResponseEntity<?> getQuarterData() {
         String username = SecurityUtil.getUsername();
         int userId = userService.getUserId(username);
         String seq = userService.getUser(userId).getSeq();
         
+        Map<String, Object> response = new HashMap<>();
         try {
             Map<String, Object> data = consumptionService.aggregateTotalSpendingBySeq(seq);
-            return ResponseEntity.ok(data);
+            response.put("data", data);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // 오류 처리
-            return ResponseEntity.internalServerError().body("An error occurred: " + e.getMessage());
+            response.put("data", null);
+            response.put("error", "An error occurred: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
     }
     
@@ -56,20 +60,23 @@ public class ConsumptionController {
 	    
         String currentQuarter = quarter;
 	    String previousQuarter = consumptionService.calculatePreviousQuarter(quarter);
+	    Map<String, Object> response = new HashMap<>();
 	    
 	    if (previousQuarter.contains("2021")) {
-	    	return ResponseEntity.internalServerError().body("직전 분기가 존재하지 않습니다.");
+	        response.put("data", null);
+	        response.put("error", "직전 분기가 존재하지 않습니다.");
+	        return ResponseEntity.internalServerError().body(response);
 	    }
 	    
-        try {
-            Map<String, Map<String, Integer>> data = consumptionService.calculateQuarterDifference(seq, currentQuarter, previousQuarter);
-            return ResponseEntity.ok(data);
-        } catch (Exception e) {
-            // 오류 처리
-            return ResponseEntity.internalServerError().body("An error occurred: " + e.getMessage());
-        }
-
+	    try {
+	        Map<String, Map<String, Integer>> data = consumptionService.calculateQuarterDifference(seq, currentQuarter, previousQuarter);
+	        response.put("data", data);
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        response.put("data", null);
+	        response.put("error", "An error occurred: " + e.getMessage());
+	        return ResponseEntity.internalServerError().body(response);
+	    }
     }
-
-   }
+}
  
