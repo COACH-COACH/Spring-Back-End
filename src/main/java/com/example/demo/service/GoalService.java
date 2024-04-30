@@ -212,28 +212,10 @@ public class GoalService {
         lifeStageGoals.getOrDefault(user.getLifeStage(), List.of()).forEach(goalName -> {
             statisticsList.add(GoalStatistics.builder()
                     .goalName(goalName)
-                    .goalRate(0.0f)
-                    .goalAvgTargetAmt(BigDecimal.ZERO)
                     .build());
         });
-		
-		// 3. 목표별 group by 해서 통계량 산출
-	    List<Object[]> results = goalRepo.findGoalStatistics();
-        for (Object[] result : results) {
-            String goalName = (String) result[0];
-            float goalRate = ((Number) result[1]).floatValue();
-            BigDecimal goalAvgTargetAmt = BigDecimal.valueOf(((Number) result[2]).doubleValue());
-
-            statisticsList.stream()
-                    .filter(stat -> stat.getGoalName().equals(goalName))
-                    .findFirst()
-                    .ifPresent(stat -> {
-                        stat.setGoalRate(goalRate);
-                        stat.setGoalAvgTargetAmt(goalAvgTargetAmt);
-                    });
-        }
         
-        // 4. user 정보와 결합
+        // 3. user 정보와 결합
         GoalCategoryResDto resDto = GoalCategoryResDto.builder()
         		.fullName(user.getFullName())
         		.categoryList(statisticsList)
@@ -246,7 +228,7 @@ public class GoalService {
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
-	    // TODO: 1. 현재 유저의 목표가 3개인 경우 추가 불가
+	    // 1. 현재 유저의 목표가 3개인 경우 추가 불가
 	    List<Goal> curGoalList = goalRepo.findByUserIdAndGoalSt(user.getId(), (byte) 0);
 	    if (curGoalList.size() >= 3) {
 	    	throw new GoalLimitExceededException("사용자는 최대 3개의 목표만 가질 수 있습니다.");

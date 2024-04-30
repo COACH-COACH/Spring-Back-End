@@ -1,9 +1,6 @@
 package com.example.demo.model.dto.response;
 
-import java.math.BigDecimal;
 import java.util.List;
-
-import com.example.demo.model.enums.LifeStage;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +25,5 @@ public class GoalCategoryResDto {
 	@Getter @Setter
 	public static class GoalStatistics {
 		String goalName;
-		float goalRate;
-		BigDecimal goalAvgTargetAmt;
 	}
 }
