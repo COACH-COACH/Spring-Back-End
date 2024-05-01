@@ -2,7 +2,6 @@ package com.example.demo.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,8 +18,9 @@ import com.example.demo.exception.GoalLimitExceededException;
 import com.example.demo.model.dto.GoalDto;
 import com.example.demo.model.dto.request.CreateGoalReqDto;
 import com.example.demo.model.dto.response.GoalCategoryResDto;
-import com.example.demo.model.dto.response.GoalCategoryResDto.GoalStatistics;
+import com.example.demo.model.dto.response.GoalCategoryResDto.GoalName;
 import com.example.demo.model.dto.response.GoalListResDto;
+import com.example.demo.model.dto.response.GoalListResDto.GoalStatistics;
 import com.example.demo.model.entity.Enroll;
 import com.example.demo.model.entity.Goal;
 import com.example.demo.model.entity.Plan;
@@ -74,16 +74,38 @@ public class GoalService {
         lifeStageGoals.put(LifeStage.RETIR, List.of("건강", "창업비용", "취미", "자기계발", "기타목돈"));
     }
 	
+	// [메인 페이지] 목표 별 상품 조회 API
 	public GoalListResDto getGoalProductListByUsername(String username) {
 		User user = Optional.of(userRepo.findByLoginId(username))
 	            .orElseThrow(() -> new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 
+		// 1. 목표 목록 조회
         List<Goal> goals = goalRepo.findByUserIdAndGoalSt(user.getId(), (byte) 0);
         if (goals.isEmpty()) {
             return new GoalListResDto();
         }
+        
+        // 2. 각 목표 통계량 조회
+        List<Object[]> statistics = goalRepo.findGoalPercentageByLifeStageAndGoalName(user.getLifeStage().toString()); // [[UNI, 여행, 16.66667], ...]
+//        Map<String, Float> lifestageProportion = statistics.stream()
+//        	    .collect(Collectors.toMap(
+//        	        stat -> (String) stat[1], // GOAL_NAME을 키로 사용
+//        	        stat -> ((Number) stat[2]).floatValue() // 비율을 Float로 변환
+//        	    ));
+        Map<String, GoalStatistics> goalStatisticsMap = new HashMap<>();
+        
+        for (Object[] record : statistics) {
+            String goalName = (String) record[1];
+            float proportion = ((Number) record[2]).floatValue();
+            BigDecimal accumulatedBalance = new BigDecimal(record[3].toString());
 
-        List<GoalListResDto.GoalAndProductDto> goalProductList = convertGoalsToDto(goals, user);
+            goalStatisticsMap.put(goalName, new GoalStatistics(proportion, accumulatedBalance));
+        }
+
+        // 3. 목표와 연결된 상품 리스트
+        List<GoalListResDto.GoalAndProductDto> goalProductList = convertGoalsToDto(goals, user, goalStatisticsMap);
+        
+        // 4. Response DTO 생성
         return GoalListResDto.builder()
             .userId(user.getId())
             .fullName(user.getFullName())
@@ -91,38 +113,41 @@ public class GoalService {
             .build();
     }
 	
-	private List<GoalListResDto.GoalAndProductDto> convertGoalsToDto(List<Goal> goals, User user) {
+	private List<GoalListResDto.GoalAndProductDto> convertGoalsToDto(List<Goal> goals, User user, Map<String, GoalStatistics> goalStatisticsMap) {
         List<GoalListResDto.GoalAndProductDto> goalProductList = new ArrayList<>();
         goals.forEach(goal -> {
             Optional<Enroll> res = enrollRepo.findByUserIdAndGoalId(user.getId(), goal.getId());
             if(res.isEmpty()) {
-            	goalProductList.add(buildGoalProductDtoWithoutEnroll(goal));
+            	goalProductList.add(buildGoalProductDtoWithoutEnroll(goal, goalStatisticsMap));
                 return;
             }
             Enroll enroll = res.get();
             Product product = enroll.getProduct();										// 2. 목표에 등록된 상품 O
             if (product.getDepositCycle().equals(DepositCycle.FLEXIBLE)) { 				// 2-1. 자유적금
                 Plan plan = planRepo.findByEnroll_id(enroll.getId()).orElse(null);
-                goalProductList.add(buildGoalProductDtoWithPlan(goal, enroll, product, plan));
+                goalProductList.add(buildGoalProductDtoWithPlan(goal, enroll, product, plan, goalStatisticsMap));
             } else {																	// 2-2. 예금 or 정기적금
-                goalProductList.add(buildGoalProductDtoWithProduct(goal, enroll, product));
+                goalProductList.add(buildGoalProductDtoWithProduct(goal, enroll, product, goalStatisticsMap));
             }
         });
         return goalProductList;
     }
 	
 	// 목표에 추가된 상품 X
-	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithoutEnroll(Goal goal) {
+	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithoutEnroll(Goal goal, Map<String, GoalStatistics> goalStatisticsMap) {
+		GoalStatistics stats = goalStatisticsMap.getOrDefault(goal.getGoalName(), new GoalListResDto.GoalStatistics(0.0f, BigDecimal.ZERO));
         return GoalListResDto.GoalAndProductDto.builder()
             .goalId(goal.getId())
             .goalName(goal.getGoalName())
             .goalSt(goal.getGoalSt())
             .goalStartDate(goal.getStartDate())
+            .goalStat(stats)
             .build();
     }
 	
 	// 목표에 추가된 상품 O(자유적금 O)
-	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithPlan(Goal goal, Enroll enroll, Product product, Plan plan) {
+	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithPlan(Goal goal, Enroll enroll, Product product, Plan plan, Map<String, GoalStatistics> goalStatisticsMap) {
+		GoalStatistics stats = goalStatisticsMap.getOrDefault(goal.getGoalName(), new GoalListResDto.GoalStatistics(0.0f, BigDecimal.ZERO));
         return GoalListResDto.GoalAndProductDto.builder()
                 .goalId(goal.getId())
                 .goalName(goal.getGoalName())
@@ -144,11 +169,13 @@ public class GoalService {
                 .depositAmtCycle(plan.getDepositAmtCycle())
                 .totalCount(plan.getTotalCount())
                 .lastDepositDate(plan.getLastDepositDate())
+                .goalStat(stats)
                 .build();
     }
 
 	// 목표에 추가된 상품 O(자유적금X)
-    private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithProduct(Goal goal, Enroll enroll, Product product) {
+    private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithProduct(Goal goal, Enroll enroll, Product product, Map<String, GoalStatistics> goalStatisticsMap) {
+		GoalStatistics stats = goalStatisticsMap.getOrDefault(goal.getGoalName(), new GoalListResDto.GoalStatistics(0.0f, BigDecimal.ZERO));
         return GoalListResDto.GoalAndProductDto.builder()
             .goalId(goal.getId())
             .goalName(goal.getGoalName())
@@ -163,6 +190,7 @@ public class GoalService {
             .productId(product.getId())
             .productName(product.getProductName())
             .depositCycle(setDepositCycle(product.getDepositCycle()))
+            .goalStat(stats)
             .build();
     }
     
@@ -205,11 +233,11 @@ public class GoalService {
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
-	    List<GoalStatistics> statisticsList = new ArrayList<>();
+	    List<GoalName> statisticsList = new ArrayList<>();
 	    
 	    // 2. statisticsList 초기화
         lifeStageGoals.getOrDefault(user.getLifeStage(), List.of()).forEach(goalName -> {
-            statisticsList.add(GoalStatistics.builder()
+            statisticsList.add(GoalName.builder()
                     .goalName(goalName)
                     .build());
         });
