@@ -19,7 +19,7 @@ import lombok.ToString;
 @Getter @Setter
 public class GoalListResDto {
 	int userId; // 유저 ID
-	String fullName; // 유저 이름 
+	String fullName; // 유저 이름
 	List<GoalAndProductDto> goals;
 	
 	@ToString
@@ -54,5 +54,18 @@ public class GoalListResDto {
 		int productId;// 상품 가입 번호
 		String productName; // 상품명(PRODUCT_TB)
 		String depositCycle; //상품 종류
+		
+		// 통계
+		GoalStatistics goalStat; // 통계량 변수 모음 객체
+	}
+	
+	@ToString
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@Getter @Setter
+	public static class GoalStatistics {
+		public float proportion; // 생애주기 별 전체 참여 목표에서 차지하는 비율 
+		public BigDecimal avgAmt; // 평균 모인 금액
 	}
 }
