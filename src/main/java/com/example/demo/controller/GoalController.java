@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.exception.GoalLimitExceededException;
 import com.example.demo.model.dto.GoalDto;
 import com.example.demo.model.dto.request.CreateGoalReqDto;
+import com.example.demo.model.dto.response.GoalCategoryResDto;
 import com.example.demo.model.dto.response.GoalListResDto;
-import com.example.demo.model.dto.response.GoalStatisticsResDto;
 import com.example.demo.service.GoalService;
 import com.example.demo.service.UserService;
 import com.example.demo.util.DefaultResponse;
@@ -63,10 +63,10 @@ public class GoalController {
 
 	
 	// [목표 생성 페이지] 각 목표 별 통계량 조회
-	@GetMapping("/statistic")
-	public ResponseEntity<DefaultResponse<List<GoalStatisticsResDto>>> getGoalDetailList() {
-	    List<GoalStatisticsResDto> goalDetailList = goalService.getGoalStatList(SecurityUtil.getUsername());
-	    DefaultResponse<List<GoalStatisticsResDto>> response = DefaultResponse.res(
+	@GetMapping("/category")
+	public ResponseEntity<DefaultResponse<GoalCategoryResDto>> getGoalDetailList() {
+		GoalCategoryResDto goalDetailList = goalService.getGoalStatList(SecurityUtil.getUsername());
+	    DefaultResponse<GoalCategoryResDto> response = DefaultResponse.res(
 	        StatusCode.OK, 
 	        ResponseMessage.READ_GOAL_SUCCESS, 
 	        goalDetailList
@@ -98,7 +98,7 @@ public class GoalController {
 	    }
 	}
 	
-	// [메인 페이지?] 목표 제거
+	// [메인 페이지] 목표 제거
 	@DeleteMapping("/{goalId}")
 	public ResponseEntity removeGoal(@PathVariable int goalId) {
 		try {

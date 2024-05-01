@@ -43,9 +43,6 @@ public class Goal {
 	@Column(name="GOAL_NAME")
 	private String goalName;
 	
-	@Column(name="ACCUMULATED_BALANCE")
-	private BigDecimal accumulatedBalance;
-	
 	@Column(name="GOAL_ST")
 	private Byte goalSt;
 	
@@ -65,7 +62,6 @@ public class Goal {
 		dto.setId(this.getId());
 		dto.setUserId(this.getUser().getId());
 		dto.setGoalName(this.getGoalName());
-		dto.setAccumulatedBalance(this.getAccumulatedBalance());
 		dto.setGoalSt(this.getGoalSt());
 		dto.setStartDate(this.getStartDate());
 		dto.setEndDate(this.getEndDate());

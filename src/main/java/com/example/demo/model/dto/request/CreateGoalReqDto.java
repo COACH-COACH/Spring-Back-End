@@ -16,6 +16,4 @@ import lombok.Setter;
 @Getter @Setter
 public class CreateGoalReqDto {
 	String goalName; // 목표 카테고리
-	BigDecimal targetCost; // 목표 금액(단위: 원)
-	int goalPeriod; // 목표 기간(단위: 개월)
 }

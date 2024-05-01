@@ -1,6 +1,5 @@
 package com.example.demo.model.dto.response;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -15,8 +14,16 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
-public class GoalStatisticsResDto {
-	String goalName;
-	float goalRate;
-	BigDecimal goalAvgTargetAmt;
+public class GoalCategoryResDto {
+	public String fullName;
+	public List<GoalStatistics> categoryList;
+
+	@ToString
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@Getter @Setter
+	public static class GoalStatistics {
+		String goalName;
+	}
 }

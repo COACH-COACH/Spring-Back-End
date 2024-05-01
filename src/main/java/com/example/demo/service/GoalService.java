@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,8 +18,9 @@ import org.springframework.stereotype.Service;
 import com.example.demo.exception.GoalLimitExceededException;
 import com.example.demo.model.dto.GoalDto;
 import com.example.demo.model.dto.request.CreateGoalReqDto;
+import com.example.demo.model.dto.response.GoalCategoryResDto;
+import com.example.demo.model.dto.response.GoalCategoryResDto.GoalStatistics;
 import com.example.demo.model.dto.response.GoalListResDto;
-import com.example.demo.model.dto.response.GoalStatisticsResDto;
 import com.example.demo.model.entity.Enroll;
 import com.example.demo.model.entity.Goal;
 import com.example.demo.model.entity.Plan;
@@ -92,14 +94,12 @@ public class GoalService {
 	private List<GoalListResDto.GoalAndProductDto> convertGoalsToDto(List<Goal> goals, User user) {
         List<GoalListResDto.GoalAndProductDto> goalProductList = new ArrayList<>();
         goals.forEach(goal -> {
-            Enroll enroll = Optional.of(enrollRepo.findByUserIdAndGoalId(user.getId(), goal.getId()))
-                .orElse(null);
-
-            if (enroll == null) {														// 1. 목표에 등록된 상품 X
-                goalProductList.add(buildGoalProductDtoWithoutEnroll(goal));
+            Optional<Enroll> res = enrollRepo.findByUserIdAndGoalId(user.getId(), goal.getId());
+            if(res.isEmpty()) {
+            	goalProductList.add(buildGoalProductDtoWithoutEnroll(goal));
                 return;
             }
-
+            Enroll enroll = res.get();
             Product product = enroll.getProduct();										// 2. 목표에 등록된 상품 O
             if (product.getDepositCycle().equals(DepositCycle.FLEXIBLE)) { 				// 2-1. 자유적금
                 Plan plan = planRepo.findByEnroll_id(enroll.getId()).orElse(null);
@@ -111,6 +111,7 @@ public class GoalService {
         return goalProductList;
     }
 	
+	// 목표에 추가된 상품 X
 	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithoutEnroll(Goal goal) {
         return GoalListResDto.GoalAndProductDto.builder()
             .goalId(goal.getId())
@@ -120,6 +121,7 @@ public class GoalService {
             .build();
     }
 	
+	// 목표에 추가된 상품 O(자유적금 O)
 	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithPlan(Goal goal, Enroll enroll, Product product, Plan plan) {
         return GoalListResDto.GoalAndProductDto.builder()
                 .goalId(goal.getId())
@@ -127,12 +129,15 @@ public class GoalService {
                 .goalSt(goal.getGoalSt())
                 .goalStartDate(goal.getStartDate())
                 .enrollId(enroll.getId())
+                .productStartDate(enroll.getStartDate())
                 .accumulatedBalance(enroll.getAccumulatedBalance())
                 .goalRate(accurateGoalRate(enroll.getStartDate(), enroll.getEndDate()))
                 .accountNum(enroll.getAccountNum())
                 .targetCost(enroll.getTargetCost())
                 .productId(product.getId())
                 .productName(product.getProductName())
+                .depositCycle(setDepositCycle(product.getDepositCycle()))
+                
                 .actionPlan(plan.getActionPlan())
                 .depositAmt(plan.getDepositAmt())
                 .depositStartDate(plan.getDepositStartDate())
@@ -142,6 +147,7 @@ public class GoalService {
                 .build();
     }
 
+	// 목표에 추가된 상품 O(자유적금X)
     private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithProduct(Goal goal, Enroll enroll, Product product) {
         return GoalListResDto.GoalAndProductDto.builder()
             .goalId(goal.getId())
@@ -149,13 +155,21 @@ public class GoalService {
             .goalSt(goal.getGoalSt())
             .goalStartDate(goal.getStartDate())
             .enrollId(enroll.getId())
+            .productStartDate(enroll.getStartDate())
             .targetCost(enroll.getTargetCost())
             .accumulatedBalance(enroll.getAccumulatedBalance())
             .goalRate(accurateGoalRate(enroll.getStartDate(), enroll.getEndDate()))
             .accountNum(enroll.getAccountNum())
             .productId(product.getId())
             .productName(product.getProductName())
+            .depositCycle(setDepositCycle(product.getDepositCycle()))
             .build();
+    }
+    
+    private String setDepositCycle(DepositCycle depositCycle) {
+    	if (depositCycle.equals(DepositCycle.FIXED)) return "예금";
+    	else if (depositCycle.equals(DepositCycle.FLEXIBLE)) return "자유적금";
+    	else return "정기적금";
     }
 	
     private float accurateGoalRate(Date startDate, Date endDate) {
@@ -186,46 +200,34 @@ public class GoalService {
         return rate > 100.0f ? 100.0f : rate;
     }
 
-	public List<GoalStatisticsResDto> getGoalStatList(String username) {
+	public GoalCategoryResDto getGoalStatList(String username) {
 		// 1. user의 라이프스테이지에 맞는 목표 가져오기
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
-	    List<GoalStatisticsResDto> statisticsList = new ArrayList<>();
+	    List<GoalStatistics> statisticsList = new ArrayList<>();
 	    
 	    // 2. statisticsList 초기화
         lifeStageGoals.getOrDefault(user.getLifeStage(), List.of()).forEach(goalName -> {
-            statisticsList.add(GoalStatisticsResDto.builder()
+            statisticsList.add(GoalStatistics.builder()
                     .goalName(goalName)
-                    .goalRate(0.0f)
-                    .goalAvgTargetAmt(BigDecimal.ZERO)
                     .build());
         });
-		
-		// 3. 목표별 group by 해서 통계량 산출
-	    List<Object[]> results = goalRepo.findGoalStatistics();
-        for (Object[] result : results) {
-            String goalName = (String) result[0];
-            float goalRate = ((Number) result[1]).floatValue();
-            BigDecimal goalAvgTargetAmt = BigDecimal.valueOf(((Number) result[2]).doubleValue());
+        
+        // 3. user 정보와 결합
+        GoalCategoryResDto resDto = GoalCategoryResDto.builder()
+        		.fullName(user.getFullName())
+        		.categoryList(statisticsList)
+        		.build();
 
-            statisticsList.stream()
-                    .filter(stat -> stat.getGoalName().equals(goalName))
-                    .findFirst()
-                    .ifPresent(stat -> {
-                        stat.setGoalRate(goalRate);
-                        stat.setGoalAvgTargetAmt(goalAvgTargetAmt);
-                    });
-        }
-
-        return statisticsList;
+        return resDto;
 	}
 	
 	public GoalDto addGoal(CreateGoalReqDto reqDto, String username) {
 	    User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 	    
-	    // TODO: 1. 현재 유저의 목표가 3개인 경우 추가 불가
+	    // 1. 현재 유저의 목표가 3개인 경우 추가 불가
 	    List<Goal> curGoalList = goalRepo.findByUserIdAndGoalSt(user.getId(), (byte) 0);
 	    if (curGoalList.size() >= 3) {
 	    	throw new GoalLimitExceededException("사용자는 최대 3개의 목표만 가질 수 있습니다.");
@@ -236,7 +238,6 @@ public class GoalService {
 				.user(user)
 				.goalName(reqDto.getGoalName())
 				.startDate(new Date())
-				.accumulatedBalance(BigDecimal.ZERO)
 				.goalSt((byte) 0)
 				.build();
 		Goal result = goalRepo.save(newGoal);

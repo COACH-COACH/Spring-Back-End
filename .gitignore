@@ -33,7 +33,6 @@ build/
 .vscode/
 
 ### properties ###
-application.properties
 
 .DS_Store
 .env

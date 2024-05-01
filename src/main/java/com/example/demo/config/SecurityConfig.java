@@ -64,7 +64,7 @@ public class SecurityConfig {
 
 			    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081", "http://localhost:8080", "http://localhost:5000"));
 
-			    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+			    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 			    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 			    configuration.setAllowCredentials(true); // 쿠키를 포함시킬지 여부
 			    configuration.addExposedHeader("Authorization");
