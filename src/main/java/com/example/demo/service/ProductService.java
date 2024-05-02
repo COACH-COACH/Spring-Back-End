@@ -36,6 +36,7 @@ import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.demo.config.FlaskConfig;
 import com.example.demo.model.document.ProductDocument;
 import com.example.demo.model.document.SearchKeywordDocument;
 import com.example.demo.model.dto.EnrollDto;
@@ -72,6 +73,9 @@ public class ProductService {
 	private final EnrollRepo enrollRepo;
 	private final RestTemplate restTemplate;
 	private static final Logger log = LoggerFactory.getLogger(ProductService.class);
+
+    @Autowired
+    private FlaskConfig flaskConfig;
 	
 	@Autowired
 	public ProductService(ElasticsearchOperations elasticsearchOperations,
@@ -97,7 +101,7 @@ public class ProductService {
 	
 	// flask에서 추천된 상품 json파일 가져오기
 	public RecommendationResDto getRecommendations(int userId){
-		String url = "http://localhost:5000/recommendation/" + userId;
+		String url = flaskConfig.flaskUrl + "/recommendation/" + userId;
 		ResponseEntity<HashMap> response = restTemplate.getForEntity(url, HashMap.class);  
 		HashMap<String, List<HashMap>> rawData = response.getBody();
 		

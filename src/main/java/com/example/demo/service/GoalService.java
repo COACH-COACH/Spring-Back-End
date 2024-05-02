@@ -122,11 +122,14 @@ public class GoalService {
                 return;
             }
             Enroll enroll = res.get();
-            Product product = enroll.getProduct();										// 2. 목표에 등록된 상품 O
-            if (product.getDepositCycle().equals(DepositCycle.FLEXIBLE)) { 				// 2-1. 자유적금
-                Plan plan = planRepo.findByEnroll_id(enroll.getId()).orElse(null);
+            Product product = enroll.getProduct();		
+            Optional<Plan> planRes = planRepo.findByEnroll_id(enroll.getId());
+            
+            // 2. 목표에 등록된 상품 O
+            if (product.getDepositCycle().equals(DepositCycle.FLEXIBLE) && planRes.isPresent()) { // 2-1. 자유적금 and 실천방안 존재
+                Plan plan = planRes.get();
                 goalProductList.add(buildGoalProductDtoWithPlan(goal, enroll, product, plan, goalStatisticsMap));
-            } else {																	// 2-2. 예금 or 정기적금
+            } else {																	// 2-2. 예금 or 정기적금 or 실천방안이 없는 자유적금
                 goalProductList.add(buildGoalProductDtoWithProduct(goal, enroll, product, goalStatisticsMap));
             }
         });
@@ -145,7 +148,7 @@ public class GoalService {
             .build();
     }
 	
-	// 목표에 추가된 상품 O(자유적금 O)
+	// 목표에 추가된 상품 O(자유적금 O AND 실천방안 O)
 	private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithPlan(Goal goal, Enroll enroll, Product product, Plan plan, Map<String, GoalStatistics> goalStatisticsMap) {
 		GoalStatistics stats = goalStatisticsMap.getOrDefault(goal.getGoalName(), new GoalListResDto.GoalStatistics(0.0f, BigDecimal.ZERO));
         return GoalListResDto.GoalAndProductDto.builder()
@@ -173,7 +176,7 @@ public class GoalService {
                 .build();
     }
 
-	// 목표에 추가된 상품 O(자유적금X)
+	// 목표에 추가된 상품 O(자유적금X OR (자유적금O AND 실천방안 X))
     private GoalListResDto.GoalAndProductDto buildGoalProductDtoWithProduct(Goal goal, Enroll enroll, Product product, Map<String, GoalStatistics> goalStatisticsMap) {
 		GoalStatistics stats = goalStatisticsMap.getOrDefault(goal.getGoalName(), new GoalListResDto.GoalStatistics(0.0f, BigDecimal.ZERO));
         return GoalListResDto.GoalAndProductDto.builder()
