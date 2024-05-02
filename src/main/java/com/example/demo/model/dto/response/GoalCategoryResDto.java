@@ -16,14 +16,14 @@ import lombok.ToString;
 @Getter @Setter
 public class GoalCategoryResDto {
 	public String fullName;
-	public List<GoalStatistics> categoryList;
+	public List<GoalName> categoryList;
 
 	@ToString
 	@Builder
 	@AllArgsConstructor
 	@NoArgsConstructor
 	@Getter @Setter
-	public static class GoalStatistics {
+	public static class GoalName {
 		String goalName;
 	}
 }
