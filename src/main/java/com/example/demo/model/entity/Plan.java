@@ -14,8 +14,7 @@ import com.example.demo.model.dto.PlanDto;
 
 @Entity
 @Builder
-@Getter @Setter
-@NoArgsConstructor
+@Getter @Setter@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "PLAN_TB")
 public class Plan {
@@ -26,7 +25,7 @@ public class Plan {
     private int id;
 
     @OneToOne
-    @JoinColumn(name = "ENROLL_ID_FK", referencedColumnName = "ID_PK", insertable = false, updatable = false)
+    @JoinColumn(name = "ENROLL_ID_FK", referencedColumnName = "ID_PK")
     private Enroll enroll;
     
     @Column(name = "ACTION_PLAN")

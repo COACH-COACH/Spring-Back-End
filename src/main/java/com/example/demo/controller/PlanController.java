@@ -29,6 +29,7 @@ public class PlanController {
 	
 	@PostMapping("/{enrollId}")
 	public ResponseEntity<DefaultResponse<PlanDto>> createPlan(@RequestBody CreatePlanReqDto dto, @PathVariable int enrollId) {
+		System.out.println(dto.toString());
 		try {
 			PlanDto planDto = planService.savePlan(SecurityUtil.getUsername(), dto, enrollId);
 			return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CREATE_PLAN_SUCCESS, planDto));
@@ -39,8 +40,15 @@ public class PlanController {
 	}
 	
 	@GetMapping("/{enrollId}")
-	public CreatePlanResDto getActionPlanDetail(@PathVariable int enrollId) {
-		CreatePlanResDto resDto = planService.findActionPlanDetail(SecurityUtil.getUsername(), enrollId);
-		return resDto;
+	public ResponseEntity<DefaultResponse<CreatePlanResDto>> getActionPlanDetail(@PathVariable int enrollId) {
+		try {
+			CreatePlanResDto resDto = planService.findActionPlanDetail(SecurityUtil.getUsername(), enrollId);
+			return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.READ_PLAN_SUCCESS, resDto));
+		} catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+		            .body(DefaultResponse.res(StatusCode.SERVICE_UNAVAILABLE, e.getMessage()));
+		}
+		
+		
 	}
 }

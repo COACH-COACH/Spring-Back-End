@@ -25,4 +25,5 @@ public class ResponseMessage {
     
     public static final String CREATE_PLAN_SUCCESS = "실천방안 생성 성공";
     public static final String CREATE_PLAN_FAIL = "실천방안 생성 실패";
+    public static final String READ_PLAN_SUCCESS = "실천방안 조회 성공";
 }

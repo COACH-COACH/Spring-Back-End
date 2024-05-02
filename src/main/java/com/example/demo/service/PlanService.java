@@ -24,6 +24,8 @@ import com.example.demo.repository.GoalRepo;
 import com.example.demo.repository.PlanRepo;
 import com.example.demo.repository.UserRepo;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class PlanService {
 	
@@ -39,16 +41,21 @@ public class PlanService {
 	@Autowired
 	private GoalRepo goalRepo;
 
+	@Transactional
 	public PlanDto savePlan(String username, CreatePlanReqDto dto, int enrollId) throws Exception {
 		User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         	new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 		
 		Optional<Enroll> res = enrollRepo.findById(enrollId);
-		if (res.isPresent()) {
-			throw new Exception("이미 실천방안이 존재하는 목표입니다");
+		if (!res.isPresent()) {
+			throw new Exception("존재하지 않는 목표입니다.");
 		}
 		Enroll enroll = res.get();
 		System.out.println(enroll.toString());
+		
+		if (planRepo.findByEnroll_id(enrollId).isPresent()) {
+			throw new Exception("이미 실천방안이 추가된 목표입니다.");
+		}
 		
 		Plan newPlan = new Plan().builder()
 				.enroll(enroll)
@@ -63,19 +70,19 @@ public class PlanService {
 		return planRepo.save(newPlan).toDto();
 	}
 
-	public CreatePlanResDto findActionPlanDetail(String username, int enrollId) {
+	public CreatePlanResDto findActionPlanDetail(String username, int enrollId) throws Exception {
 		User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
     		new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 		
 		Optional<Enroll> resEnroll = enrollRepo.findById(enrollId);
 		if (resEnroll.isEmpty()) {
-			return null;
+			throw new Exception("존재하지 않는 상품입니다.");
 		}
 		Enroll enroll = resEnroll.get();
 		
 		Optional<Goal> resGoal = goalRepo.findById(enroll.getGoal().getId());
 		if (resGoal.isEmpty()) {
-			return null;
+			throw new Exception("존재하지 않는 목표입니다.");
 		}
 		Goal goal = resGoal.get();
 		
