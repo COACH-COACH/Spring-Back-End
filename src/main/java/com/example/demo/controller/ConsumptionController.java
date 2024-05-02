@@ -1,4 +1,6 @@
 package com.example.demo.controller;
+import java.util.HashMap;
+import java.util.List;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,5 +80,25 @@ public class ConsumptionController {
 	        return ResponseEntity.internalServerError().body(response);
 	    }
     }
+    
+    // 지난 분기과 예측 소비액 비교
+    @GetMapping("/comparePrediction")
+    public ResponseEntity<?> comparePrediction() {
+        String username = SecurityUtil.getUsername();
+        int userId = userService.getUserId(username);
+        String seq = userService.getUser(userId).getSeq();
+        
+        Map<String, Object> response = new HashMap<>();
+        try {
+        	Map<String, List<?>> data = consumptionService.comparePrediction(seq);
+        	response.put("data", data);
+        	return ResponseEntity.ok(response);
+        } catch (Exception e) {
+	        response.put("data", null);
+	        response.put("error", "An error occurred: " + e.getMessage());
+	        return ResponseEntity.internalServerError().body(response);
+        }
+    }
 }
+
  
