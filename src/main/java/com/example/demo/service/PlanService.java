@@ -39,12 +39,19 @@ public class PlanService {
 	@Autowired
 	private GoalRepo goalRepo;
 
-	public PlanDto savePlan(String username, CreatePlanReqDto dto, int enrollId) {
+	public PlanDto savePlan(String username, CreatePlanReqDto dto, int enrollId) throws Exception {
 		User user = Optional.of(userRepo.findByLoginId(username)).orElseThrow(() -> 
         	new UsernameNotFoundException("다음 로그인 아이디에 해당하는 유저가 없습니다: " + username));
 		
+		Optional<Enroll> res = enrollRepo.findById(enrollId);
+		if (res.isPresent()) {
+			throw new Exception("이미 실천방안이 존재하는 목표입니다");
+		}
+		Enroll enroll = res.get();
+		System.out.println(enroll.toString());
+		
 		Plan newPlan = new Plan().builder()
-				.enroll(enrollRepo.findById(enrollId).get())
+				.enroll(enroll)
 				.actionPlan(dto.actionPlan)
 				.startDate(new Date())
 				.depositAmt(dto.depositAmt)

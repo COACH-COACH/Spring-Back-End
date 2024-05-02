@@ -32,9 +32,9 @@ public class PlanController {
 		try {
 			PlanDto planDto = planService.savePlan(SecurityUtil.getUsername(), dto, enrollId);
 			return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CREATE_PLAN_SUCCESS, planDto));
-		} catch (GoalLimitExceededException e) {
+		} catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-	            .body(DefaultResponse.res(StatusCode.SERVICE_UNAVAILABLE, ResponseMessage.CREATE_PLAN_FAIL));
+	            .body(DefaultResponse.res(StatusCode.SERVICE_UNAVAILABLE, e.getMessage()));
 	    }
 	}
 	
