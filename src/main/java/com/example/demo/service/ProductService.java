@@ -322,7 +322,7 @@ public class ProductService {
         // DEPOSIT
         if (product.getProductType()==ProductType.DEPOSIT) {
             BigDecimal depositAmount = requestDto.getDepositAmount();
-            BigDecimal targetCostSavings = maturity.multiply(depositAmount); 		// 적금 상품 목표 금액 생성 
+            BigDecimal targetCostSavings = maturity.multiply(depositAmount); // 적금 상품 목표 금액 생성 
 	          enroll.setAccumulatedBalance(requestDto.getDepositAmount());
 	          enroll.setTargetCost(requestDto.getDepositAmount());			// 예치금을 목표 금액으로
 	          enroll.setAccumulatedBalance(requestDto.getDepositAmount()); 	// 예치금을 계좌 잔액에 예치
@@ -330,29 +330,17 @@ public class ProductService {
         // SAVINGS & FIX
         else if (product.getDepositCycle()==DepositCycle.FIXED) {
             BigDecimal depositAmount = requestDto.getDepositAmount();
-            BigDecimal targetCostSavings = maturity.multiply(depositAmount); 		// 적금 상품 목표 금액 생성 
-	          enroll.setDepositAmtCycle(requestDto.getDepositAmount());		// 매달 입금할 금액 -> 목표 금액 계산에 이용
-	          enroll.setAccumulatedBalance(requestDto.getFirstDeposit());	// 초기 입금액을 계좌 잔액에 예치
-	          enroll.setTargetCost(targetCostSavings);						// 목표 금액 계산 후 DB에 저장
+            BigDecimal targetCostSavings = maturity.multiply(depositAmount);	// 적금 상품 목표 금액 생성 
+	          enroll.setDepositAmtCycle(requestDto.getDepositAmount());			// 매달 입금할 금액 -> 목표 금액 계산에 이용
+	          enroll.setAccumulatedBalance(requestDto.getFirstDeposit());		// 초기 입금액을 계좌 잔액에 예치
+	          enroll.setTargetCost(targetCostSavings);							// 목표 금액 계산 후 DB에 저장
         } 
         // SAVINGS & FLEXIBLE
         else {
         	enroll.setAccumulatedBalance(requestDto.getFirstDeposit());		// 초기 입금액을 계좌 잔액에 예치
+        	enroll.setTargetCost(requestDto.getGoalAmount()); 				// 목표금액을 직접 입력받음
         }
-//        if ((product.getProductType()==ProductType.SAVINGS) & (product.getDepositCycle()==DepositCycle.FIXED) ) {
-//            enroll.setDepositAmtCycle(requestDto.getDepositAmount());		// 매달 입금할 금액 -> 목표 금액 계산에 이용
-//            enroll.setAccumulatedBalance(requestDto.getFirstDeposit());		// 초기 입금액을 계좌 잔액에 예치
-//            enroll.setTargetCost(targetCostSavings);						// 목표 금액 계산 후 DB에 저장
-//        } else if (product.getProductType()) {
-//        	
-//        }
-//        else if (product.getProductType()==ProductType.DEPOSIT) {
-//            enroll.setAccumulatedBalance(requestDto.getDepositAmount());
-//            enroll.setTargetCost(requestDto.getDepositAmount());			// 예치금을 목표 금액으로
-//        }
         enrollRepo.save(enroll);
         log.info("Enroll saved: {}", enroll);
         }
-	
-	
 }
