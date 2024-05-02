@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,6 +170,38 @@ public class ConsumptionService {
         String yearQuarter = year + quarterName;
         System.out.println(yearQuarter);
         return yearQuarter;
+    }
+    
+    // 지난 분기 총 지출액 vs 시계열 예측값
+    public  Map<String, List<?>> comparePrediction(String seq) throws IOException {
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index("consumption-original")
+                .query(q -> q
+                    .bool(b -> b
+                        .must(m -> m
+                            .term(t -> t
+                                .field("SEQ")
+                                .value(seq)))))
+            );
+
+        SearchResponse<Map> response = client.search(searchRequest, Map.class);
+        Map<String, List<?>> result = new HashMap<>();
+        List<String> quarters = new ArrayList<>();
+        List<Integer> amounts = new ArrayList<>();
+
+        response.hits().hits().forEach(hit -> {
+            Map<String, Object> source = hit.source();
+            if (source != null) {
+                if (source.containsKey("BAS_YH") && source.containsKey("TOT_USE_AM")) {
+                    quarters.add((String) source.get("BAS_YH"));
+                    amounts.add((Integer) source.get("TOT_USE_AM"));
+                }
+            }
+        });
+
+        result.put("BAS_YH", quarters);
+        result.put("TOT_USE_AM", amounts);
+        return result;
     }
 }
 
