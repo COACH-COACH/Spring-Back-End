@@ -20,10 +20,10 @@ public class GeminiService {
         this.geminiConfig = geminiConfig;
     }
 
-    public String fetchMotivationalMessage(String content) {
+    public String fetchMessage(String content) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + geminiConfig);
+        headers.set("Authorization", geminiConfig.getGeminiApiKey());
 
         String requestJson = """
             {
@@ -36,7 +36,8 @@ public class GeminiService {
         """.formatted(content);
         
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent", entity, String.class);
+        String gemini_api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=";
+        ResponseEntity<String> response = restTemplate.postForEntity(gemini_api_url + geminiConfig.getGeminiApiKey(), entity, String.class);
 
         return response.getBody();
     }
