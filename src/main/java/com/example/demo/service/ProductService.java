@@ -330,7 +330,7 @@ public class ProductService {
         // SAVINGS & FIX
         else if (product.getDepositCycle()==DepositCycle.FIXED) {
             BigDecimal depositAmount = requestDto.getDepositAmount();
-            BigDecimal targetCostSavings = maturity.multiply(depositAmount);	// 적금 상품 목표 금액 생성 
+            BigDecimal targetCostSavings = maturity.multiply(depositAmount); // 적금 상품 목표 금액 생성 
 	          enroll.setDepositAmtCycle(requestDto.getDepositAmount());			// 매달 입금할 금액 -> 목표 금액 계산에 이용
 	          enroll.setAccumulatedBalance(requestDto.getFirstDeposit());		// 초기 입금액을 계좌 잔액에 예치
 	          enroll.setTargetCost(targetCostSavings);							// 목표 금액 계산 후 DB에 저장
