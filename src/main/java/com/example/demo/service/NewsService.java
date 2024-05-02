@@ -30,16 +30,14 @@ public class NewsService {
         this.goalRepo = goalRepo;
     }
 
-    public List<NewsResDto> findNewsByUserPreferences(String loginId) {
-        User user = userRepo.findByLoginId(loginId);
-        if (user == null) {
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + loginId);
-        }
+    public List<NewsResDto> findNewsByUserPreferences(int userId) {
+    	User user = userRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId)); 
         LifeStage lifeStage = user.getLifeStage();
-        List<Goal> goals = goalRepo.findByUserId(user.getId());
-        if (goals == null || goals.isEmpty()) {
+        List<Goal> goals = goalRepo.findByUserIdAndGoalSt(userId, (byte) 0);
+        if (goals.isEmpty()) {
             return Collections.emptyList();
         }
+        
 
         List<NewsResDto> newsResDtoList = new ArrayList<>();
         for (Goal goal : goals) {
