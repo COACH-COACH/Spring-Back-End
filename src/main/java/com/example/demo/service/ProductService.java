@@ -53,6 +53,7 @@ import com.example.demo.model.entity.Enroll;
 import com.example.demo.model.entity.Goal;
 import com.example.demo.model.entity.Product;
 import com.example.demo.model.entity.User;
+import com.example.demo.model.enums.DepositCycle;
 import com.example.demo.model.enums.ProductType;
 import com.example.demo.model.dto.request.RecommendationProductReqDto;
 import com.example.demo.model.dto.request.SearchProductReqDto;
@@ -307,10 +308,7 @@ public class ProductService {
             System.out.println("EndDate after adding maturity: " + calendar.getTime());
 
             String accountNumber = AccountNumberGenerator.generateAccountNumber();	// 계좌번호 생성
-            
-            BigDecimal depositAmount = requestDto.getDepositAmount();
             BigDecimal maturity = new BigDecimal(product.getMaturity());
-            BigDecimal targetCostSavings = maturity.multiply(depositAmount); 		// 적금 상품 목표 금액 생성 
             
             Enroll enroll = Enroll.builder()
                     .user(user)
@@ -321,14 +319,37 @@ public class ProductService {
                     .maturitySt((byte) 0) 			// 처음 가입시 0으로 설정
                     .accountNum(accountNumber)
                     .build();
-        if (product.getProductType()==ProductType.SAVINGS) {
-            enroll.setDepositAmtCycle(requestDto.getDepositAmount());		// 매달 입금할 금액 -> 목표 금액 계산에 이용
-            enroll.setAccumulatedBalance(requestDto.getFirstDeposit());		// 초기 입금액을 계좌 잔액에 예치
-            enroll.setTargetCost(targetCostSavings);						// 목표 금액 계산 후 DB에 저장
-        } else if (product.getProductType()==ProductType.DEPOSIT) {
-            enroll.setAccumulatedBalance(requestDto.getDepositAmount());
-            enroll.setTargetCost(requestDto.getDepositAmount());			// 예치금을 목표 금액으로
+        // DEPOSIT
+        if (product.getProductType()==ProductType.DEPOSIT) {
+            BigDecimal depositAmount = requestDto.getDepositAmount();
+            BigDecimal targetCostSavings = maturity.multiply(depositAmount); 		// 적금 상품 목표 금액 생성 
+	          enroll.setAccumulatedBalance(requestDto.getDepositAmount());
+	          enroll.setTargetCost(requestDto.getDepositAmount());			// 예치금을 목표 금액으로
+	          enroll.setAccumulatedBalance(requestDto.getDepositAmount()); 	// 예치금을 계좌 잔액에 예치
+        } 
+        // SAVINGS & FIX
+        else if (product.getDepositCycle()==DepositCycle.FIXED) {
+            BigDecimal depositAmount = requestDto.getDepositAmount();
+            BigDecimal targetCostSavings = maturity.multiply(depositAmount); 		// 적금 상품 목표 금액 생성 
+	          enroll.setDepositAmtCycle(requestDto.getDepositAmount());		// 매달 입금할 금액 -> 목표 금액 계산에 이용
+	          enroll.setAccumulatedBalance(requestDto.getFirstDeposit());	// 초기 입금액을 계좌 잔액에 예치
+	          enroll.setTargetCost(targetCostSavings);						// 목표 금액 계산 후 DB에 저장
+        } 
+        // SAVINGS & FLEXIBLE
+        else {
+        	enroll.setAccumulatedBalance(requestDto.getFirstDeposit());		// 초기 입금액을 계좌 잔액에 예치
         }
+//        if ((product.getProductType()==ProductType.SAVINGS) & (product.getDepositCycle()==DepositCycle.FIXED) ) {
+//            enroll.setDepositAmtCycle(requestDto.getDepositAmount());		// 매달 입금할 금액 -> 목표 금액 계산에 이용
+//            enroll.setAccumulatedBalance(requestDto.getFirstDeposit());		// 초기 입금액을 계좌 잔액에 예치
+//            enroll.setTargetCost(targetCostSavings);						// 목표 금액 계산 후 DB에 저장
+//        } else if (product.getProductType()) {
+//        	
+//        }
+//        else if (product.getProductType()==ProductType.DEPOSIT) {
+//            enroll.setAccumulatedBalance(requestDto.getDepositAmount());
+//            enroll.setTargetCost(requestDto.getDepositAmount());			// 예치금을 목표 금액으로
+//        }
         enrollRepo.save(enroll);
         log.info("Enroll saved: {}", enroll);
         }
