@@ -53,7 +53,7 @@ public class GoalController {
 	    return ResponseEntity.ok(response);
 	}
 	
-	// [메인 페이지] 회원 목표 조회
+	// [메인 페이지] 회원 목표 리스트 조회
 	@GetMapping("/product/list")
 	public ResponseEntity<DefaultResponse<GoalListResDto>> getGoalProductList() {
 	    GoalListResDto goalListResDto = goalService.getGoalProductListByUsername(SecurityUtil.getUsername());
@@ -62,7 +62,7 @@ public class GoalController {
 	}
 
 	
-	// [목표 생성 페이지] 각 목표 별 통계량 조회
+	// [목표 생성 페이지] 각 생애주기 별 추천 목표 카테고리 조회
 	@GetMapping("/category")
 	public ResponseEntity<DefaultResponse<GoalCategoryResDto>> getGoalDetailList() {
 		GoalCategoryResDto goalDetailList = goalService.getGoalStatList(SecurityUtil.getUsername());
