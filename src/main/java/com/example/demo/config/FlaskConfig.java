@@ -7,5 +7,8 @@ import org.springframework.context.annotation.Configuration;
 public class FlaskConfig {
 	@Value("${spring.flask.url}")
 	public String flaskUrl;
+	
+	@Value("${vue.url}")
+	public String vueUrl;
 
 }
