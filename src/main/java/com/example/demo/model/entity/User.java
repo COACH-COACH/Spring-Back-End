@@ -21,8 +21,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-
+@ToString(exclude="payments")
 @Builder
 @Data   // RequiredArgsConstructor만 가져오기 때문 
 @NoArgsConstructor
@@ -69,7 +70,7 @@ public class User {
 	private Boolean activeStatus;
 	
 	// 관계설정
-	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy="user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<Payment> payments;
 	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
 	private List<Goal> goals;

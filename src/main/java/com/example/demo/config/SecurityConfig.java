@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,9 @@ public class SecurityConfig {
 	private final AuthenticationConfiguration authenticationConfiguration;
 	private final JWTUtil jwtUtil;
 	private final UserRepo urepo;
+	
+	@Autowired
+	private FlaskConfig flaskConfig;
 
     public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, UserRepo urepo) {
         this.authenticationConfiguration = authenticationConfiguration;
@@ -62,7 +66,7 @@ public class SecurityConfig {
 				CorsConfiguration configuration = new CorsConfiguration();
 				
 
-			    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081", "http://localhost:8080", "http://localhost:5000"));
+			    configuration.setAllowedOrigins(Arrays.asList(flaskConfig.vueUrl, flaskConfig.flaskUrl));
 
 			    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 			    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));

@@ -3,6 +3,7 @@ import java.math.BigDecimal;
 //import java.util.List;
 
 import com.example.demo.model.dto.PaymentDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +19,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 //import lombok.ToString;
+import lombok.ToString;
 
+@ToString(exclude="user")
 @Builder
 @Data   // RequiredArgsConstructor만 가져오기 때문 
 @NoArgsConstructor

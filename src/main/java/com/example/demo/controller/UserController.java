@@ -3,11 +3,7 @@ package com.example.demo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.config.FlaskConfig;
-import com.example.demo.model.dto.PaymentDto;
 import com.example.demo.model.dto.UserDto;
 import com.example.demo.service.UserService;
 import com.example.demo.util.DefaultResponse;
@@ -107,37 +102,17 @@ public class UserController {
 
     	userService.deactivateUser(username);
 	}
-	
-	// 4. 소비 예측할 사람의 분기 별 소비 내역 가져오기
-	@GetMapping("/timeSeriesPrediction/{id}")
-	public List<PaymentDto> getPaymentsByCustomerId(@PathVariable int id) {
-        return userService.getPaymentsByCustomerId(id);
-    }
-	
-	// 5. flask와 통신 후 예측 완료된 값 return
+    
+    // 다음 분기 소비 예측
 	@GetMapping("/invoke-flask")
     public String invokeFlaskServer() {
-		String url = flaskConfig.flaskUrl + "/timeSeries"; // Flask 서버의 엔드포인트 URL
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<>(headers);
-		
-		// 현재 로그인한 유저의 토큰으로, USER_TB의 ID_PK 값 알아내기
 		String username = SecurityUtil.getUsername();
-		int userId = userService.getUserId(username);
-
-		// Spring Boot 애플리케이션에서 데이터를 가져오는 로직
-        // 예를 들어, 특정 URL을 호출하여 데이터를 가져온다고 가정
-		ResponseEntity<String> data = restTemplate.exchange(
-				"http://localhost:8080/user/timeSeriesPrediction/" + userId, 
-				HttpMethod.GET, 
-				new HttpEntity<>(headers), 
-				String.class);
-
-        // Flask 서버로 데이터를 전송하여 요청 보내기
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, data, String.class);
-
-        return response.getBody();
+		try {
+			String nextQuaterPayment = userService.getPredictPayment(username);
+			return nextQuaterPayment;
+		} catch(Exception e) {
+			System.out.println(e);
+			return "다음 분기 소비량 예측에 실패했습니다.";
+		}
     }
 }
