@@ -1,6 +1,7 @@
 package com.example.demo.service;
 //import java.util.Optional;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -8,9 +9,15 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.example.demo.config.FlaskConfig;
 import com.example.demo.model.dto.PaymentDto;
 import com.example.demo.model.dto.UserDto;
 import com.example.demo.model.entity.Payment;
@@ -19,6 +26,10 @@ import com.example.demo.model.enums.LifeStage;
 import com.example.demo.model.enums.Sex;
 import com.example.demo.repository.PaymentRepo;
 import com.example.demo.repository.UserRepo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.transaction.Transactional;
 //import lombok.extern.slf4j.Slf4j;
 
 //@Slf4j
@@ -28,12 +39,17 @@ public class UserService {
 	private final UserRepo urepo;
 	private final PaymentRepo prepo;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	private final RestTemplate restTemplate;
 	
 	@Autowired
-	public UserService(UserRepo urepo, PaymentRepo prepo, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    private FlaskConfig flaskConfig;
+	
+	@Autowired
+	public UserService(UserRepo urepo, PaymentRepo prepo, BCryptPasswordEncoder bCryptPasswordEncoder, RestTemplate restTemplate) {
         this.urepo = urepo;
         this.prepo = prepo;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.restTemplate = restTemplate;
     }
 	
 	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -111,13 +127,23 @@ public class UserService {
 		return user.toDto();
 	}
 	
-	// 특정 CUSTOMER_ID_FK 값에 해당하는 정보들을 PAYMENT_TB에서 조회
-    public List<PaymentDto> getPaymentsByCustomerId(int customerId) {
-        List<Payment> payments = prepo.findByUser_Id(customerId);
-        return payments.stream()
-                       .map(Payment::toDto)
-                       .collect(Collectors.toList());
-    }
+	// 다음 분기 소비 예측
+	@Transactional
+	public String getPredictPayment(String username) {
+		User user = urepo.findByLoginId(username);
+		List<PaymentDto> payments = prepo.findByUser_Id(user.getId()).stream()
+				.map(Payment::toDto)
+				.collect(Collectors.toList());
+		
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON);
+	    
+	    HttpEntity<List<PaymentDto>> entity = new HttpEntity<>(payments, headers);
+		
+		String url = flaskConfig.flaskUrl + "/timeSeries";
+		ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+		return response.getBody();
+	}
     
     public int getUserId(String username) {
     	User user = urepo.findByLoginId(username);
