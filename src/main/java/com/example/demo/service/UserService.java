@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -141,7 +142,10 @@ public class UserService {
 	    HttpEntity<List<PaymentDto>> entity = new HttpEntity<>(payments, headers);
 		
 		String url = flaskConfig.flaskUrl + "/timeSeries";
-		ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+//		ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST,
+                entity, String.class);
+        
 		return response.getBody();
 	}
     
