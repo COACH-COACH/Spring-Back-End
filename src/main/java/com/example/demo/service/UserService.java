@@ -14,6 +14,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -31,9 +33,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 //import lombok.extern.slf4j.Slf4j;
 
-//@Slf4j
+@Slf4j
 @Service
 public class UserService {
 	
@@ -130,6 +133,28 @@ public class UserService {
 	
 	// 다음 분기 소비 예측
 	@Transactional
+	public String getPredictPayment1(String username) {
+		User user = urepo.findByLoginId(username);
+		List<PaymentDto> payments = prepo.findByUser_Id(user.getId()).stream()
+				.map(Payment::toDto)
+				.collect(Collectors.toList());
+		
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON);
+	    
+	    HttpEntity<List<PaymentDto>> entity = new HttpEntity<>(payments, headers);
+	    log.debug("getPaymentList", entity);
+		
+		String url = flaskConfig.flaskUrl + "/timeSeries";
+//		ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST,
+                entity, String.class);
+        
+		return response.getBody();
+	}
+	
+	// 수정
+	@Transactional
 	public String getPredictPayment(String username) {
 		User user = urepo.findByLoginId(username);
 		List<PaymentDto> payments = prepo.findByUser_Id(user.getId()).stream()
@@ -142,11 +167,21 @@ public class UserService {
 	    HttpEntity<List<PaymentDto>> entity = new HttpEntity<>(payments, headers);
 		
 		String url = flaskConfig.flaskUrl + "/timeSeries";
-//		ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST,
-                entity, String.class);
+		ResponseEntity<String> response = createRestTemplate().postForEntity(url, entity, String.class);
         
 		return response.getBody();
+	}
+	
+	public RestTemplate createRestTemplate() {
+	    // SimpleClientHttpRequestFactory 인스턴스 생성
+	    SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+
+	    // BufferingClientHttpRequestFactory로 래핑하여 요청을 버퍼링함
+	    BufferingClientHttpRequestFactory bufferingFactory = new BufferingClientHttpRequestFactory(factory);
+
+	    // RestTemplate에 적용
+	    RestTemplate restTemplate = new RestTemplate(bufferingFactory);
+	    return restTemplate;
 	}
     
     public int getUserId(String username) {
@@ -171,6 +206,32 @@ public class UserService {
         } else {
             throw new IllegalArgumentException("Unable to deactivate ; " + username);
         }
+	}
+
+	// Test Function
+	public String postTest() {
+		// 사용자 ID로 사용자 검색
+		User user = urepo.findByLoginId("yesSeq");
+		
+		// 해당 사용자 ID로 PaymentDto 리스트 조회
+		List<PaymentDto> paymentList = prepo.findByUser_Id(user.getId()).stream()
+				.map(Payment::toDto)
+				.collect(Collectors.toList());
+
+        // HttpHeaders 객체를 생성하고 Content-Type을 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // HttpEntity 객체를 생성하고 데이터와 헤더를 포함
+        HttpEntity<List<PaymentDto>> request = new HttpEntity<>(paymentList, headers);
+		
+        // Flask API의 URL
+        String url = flaskConfig.flaskUrl + "/test";
+        
+        // POST 요청을 보내고 결과를 String으로 받음
+		String response = restTemplate.postForObject(url, request, String.class);
+		
+		return response;
 	}
 
 }

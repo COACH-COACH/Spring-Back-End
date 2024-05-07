@@ -46,6 +46,12 @@ public class UserController {
 		this.restTemplate = restTemplate;
 	}
 	
+	@PostMapping("/test")
+	public String testPost() {
+		System.out.println("post test api 호출");
+		return userService.postTest();
+	}
+	
 	// 1. 데이터 조회
 	@GetMapping("/{id}")
 	public UserDto getUser(@PathVariable Integer id) {
