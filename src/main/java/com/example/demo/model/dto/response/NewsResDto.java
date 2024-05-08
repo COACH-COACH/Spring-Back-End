@@ -17,4 +17,5 @@ public class NewsResDto {
     private String newsDescription; // 뉴스 내용
     private String newsUrl; // 뉴스 원문 url
     private String newsKeywords; // 뉴스와 연관된 (생애주기 - 목표)
+    private String newsImg; // 뉴스 썸네일 이미지
 }

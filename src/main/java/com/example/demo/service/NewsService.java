@@ -61,6 +61,7 @@ public class NewsService {
                 .newsDescription(newsDocument.getNewsDescription())
                 .newsUrl(newsDocument.getNewsUrl())
                 .newsKeywords(newsDocument.getNewsKeywords())
+                .newsImg(newsDocument.getNewsImg())
                 .build();
     }
 }
