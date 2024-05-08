@@ -89,12 +89,15 @@ public class AdvisorService {
         				user.getLifeStage(), selectedGoal.getGoalName(), selectedNewsTitle+selectedNewsDescription);
         String goalCheerPrompt = 
         		String.format("현재 목표를 %s 퍼센트 달성한 %s 생애주기인 사람에게 %s 목표와 관련한 동기부여 맞춤 문구 한 마디 생성하는데, "
-        				+ "만약 100퍼센트가 넘지 않는다면 달성 퍼센티지에 맞추어 사용자가 목표에 대한 동기부여가 될만한 문구를 생성하고, 100퍼센트가 넘으면 목표를 달성한 거에 관한 축하 문구를 작성해줘."
-        				+ "번역 어투는 지양하고, 존댓말인 해요체로 작성해줘. ",
+        				+ "만약 100퍼센트가 넘지 않는다면 달성 퍼센티지에 맞추어 사용자가 목표에 대한 동기부여가 될만한 문구를 생성해줘."
+        				+ "그런데 퍼센티지가 100퍼센트 이상일 경우, 퍼센테지를 정확히 말하지 말고 그냥 100퍼센트 달성을 축하한다고 하면서 목표를 달성한 거에 관한 축하 문구를 작성해줘."
+        				+ " 이때, 생애주기에 대응하는 단어를 포함해줘. 생애주기 기호나 생애주기라는 단어 자체는 포함하지 마. 다음은 기호:단어 쌍이야."
+        				+ " {UNI:대학생, NEW_JOB:사회초년생, NEW_WED:신혼부부, NO_CHILD:무자녀 부부 HAVE_CHILD:유자녀 부부, RETIR:시니어}"
+        				+ " 번역 어투는 지양하고, 존댓말인 해요체로 작성해줘. 다정하게 말해줘.",
         				progressPercentage, user.getLifeStage(),  selectedGoal.getGoalName());
         String consumptionCheerPrompt =
-        		String.format("%s님을 위한 가장 많은 소비를 보인 식비와 관련한 절약 실천방안 문구 한 마디 생성해줘."
-        				+ "대안을 제시해줘야해. 번역 어투는 지양하고, 해요체로 작성해줘.",
+        		String.format("%s님이 가장 많은 소비를 보인 유통업, 예를 들어 편의점, 마트, 인터넷 쇼핑 등에 관련하여 절약 실천방안 문구 100자(2줄) 정도 생성해줘."
+        				+ " 대안을 제시해줘야해. 번역 어투는 지양하고, 해요체로 작성해줘. 다정하게 말해줘.",
         				user.getFullName());
         
         String newsRecommend = extractTextFromJson(geminiService.fetchMessage(newsPrompt));
