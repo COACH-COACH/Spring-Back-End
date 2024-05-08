@@ -26,8 +26,7 @@ node {
         }
         
         stage('Cleaning Up') {
-        	sh 'sudo docker rmi ${DOCKER_USER_ID}/spring-back-end-app:1.0'
-        	sh 'sudo docker rmi ${DOCKER_USER_ID}/spring-back-end-filebeat:1.0'
+        	sh 'sudo docker system prune --all --volumes --force'
         }
     }
 }
