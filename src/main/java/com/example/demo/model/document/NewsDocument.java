@@ -35,4 +35,7 @@ public class NewsDocument {
 
     @Field(name = "news_keywords",type = FieldType.Text)
     private String newsKeywords;
+    
+    @Field(name = "news_img", type = FieldType.Keyword)
+    private String newsImg;
 }
