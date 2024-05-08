@@ -8,8 +8,8 @@ import com.example.demo.repository.GoalRepo;
 import com.example.demo.repository.UserRepo;
 import com.example.demo.repository.es.NewsDocumentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.json.JSONObject;
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,7 +17,6 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 
@@ -82,17 +81,20 @@ public class AdvisorService {
         long totalDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
         long elapsedDays = ChronoUnit.DAYS.between(startLocalDate, today);
         double progress = 100.0 * elapsedDays / totalDays;
-        String progressPercentage = String.format("%.2f", progress); // 소수점 둘째 자리까지 표시
+        String progressPercentage = String.format("%.1f", progress); // 소수점 첫째 자리까지 표시
         
         // 문구 생성
         String newsPrompt = 
-        		String.format("%s 생애주기 혹은 목표 %s와 연관지어서 %s 뉴스를 3줄 요약해줘.", 
+        		String.format("%s 생애주기 혹은 목표 %s와 연관지어서 %s 뉴스를 3줄 요약해줘. ", 
         				user.getLifeStage(), selectedGoal.getGoalName(), selectedNewsTitle+selectedNewsDescription);
         String goalCheerPrompt = 
-        		String.format("현재 목표를 %s 퍼센트 달성한 %s 생애주기인 사람에게 %s 목표와 관련한 동기부여 맞춤 문구 한 마디 생성해줘. 번역 어투는 지양하고, 해요체로 작성해줘.", 
+        		String.format("현재 목표를 %s 퍼센트 달성한 %s 생애주기인 사람에게 %s 목표와 관련한 동기부여 맞춤 문구 한 마디 생성하는데, "
+        				+ "만약 100퍼센트가 넘지 않는다면 달성 퍼센티지에 맞추어 사용자가 목표에 대한 동기부여가 될만한 문구를 생성하고, 100퍼센트가 넘으면 목표를 달성한 거에 관한 축하 문구를 작성해줘."
+        				+ "번역 어투는 지양하고, 존댓말인 해요체로 작성해줘. ",
         				progressPercentage, user.getLifeStage(),  selectedGoal.getGoalName());
         String consumptionCheerPrompt =
-        		String.format("%s님을 위한 가장 많은 소비를 보인 식비와 관련한 절약 실천방안 문구 한 마디 생성해줘.대안을 제시해줘야해. 번역 어투는 지양하고, 해요체로 작성해줘.", 
+        		String.format("%s님을 위한 가장 많은 소비를 보인 식비와 관련한 절약 실천방안 문구 한 마디 생성해줘."
+        				+ "대안을 제시해줘야해. 번역 어투는 지양하고, 해요체로 작성해줘.",
         				user.getFullName());
         
         String newsRecommend = extractTextFromJson(geminiService.fetchMessage(newsPrompt));
@@ -100,7 +102,7 @@ public class AdvisorService {
         String consumptionCheer = extractTextFromJson(geminiService.fetchMessage(consumptionCheerPrompt));
         
         return new AdvisorResDto(
-        	String.format("%s 님을 위한 맞춤 뉴스를 가져왔어요. 제목: %s 요약내용: %s 원문 보기: %s", user.getFullName(), selectedNewsTitle, newsRecommend, selectedNewsUrl),
+        	String.format("%s 님을 위한 맞춤 뉴스를 가져왔어요. %s. %s 원문 보기: %s", user.getFullName(), selectedNewsTitle, newsRecommend, selectedNewsUrl),
             String.format("%s 님! \n%s", user.getFullName(), goalCheer),
             String.format("%s 님! \n%s", user.getFullName(), consumptionCheer)
         );
